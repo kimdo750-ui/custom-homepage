@@ -21,14 +21,6 @@ interface KonvaCanvasProps {
   onDeleteElement?: (id: string) => void;
 }
 
-interface SelectionBox {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
 export default function KonvaCanvas({
   elements,
   clothColor,
