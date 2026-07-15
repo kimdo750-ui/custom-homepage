@@ -113,7 +113,7 @@ function getDefaultQuotes(): QuotesData {
   };
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // 캐시 확인
     if (!cachedQuotes) {
