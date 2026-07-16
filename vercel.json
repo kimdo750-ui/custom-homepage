@@ -24,3 +24,12 @@
     }
   }
 }
+{
+  "buildCommand": "apt-get update && apt-get install -y python3 python3-pip && pip3 install opencv-python-headless numpy && npm run build",
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 60,
+      "memory": 3008
+    }
+  }
+}
