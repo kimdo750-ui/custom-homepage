@@ -57,26 +57,8 @@ export async function POST(request: NextRequest) {
     const zodiacTempOutputPath = join(tmpdir(), `zodiac_output_${Date.now()}.png`);
     tempFiles.push(zodiacTempInputPath, zodiacTempOutputPath);
 
-    // 띠그림을 임시 영문 경로로 복사
-    const zodiacBuffer = readFileSync(zodiacImagePath);
-    writeFileSync(zodiacTempInputPath, zodiacBuffer);
-    console.log('띠그림 임시 저장 완료');
-
-    // 배경 제거
-    try {
-      await execFileAsync('python', [
-        pythonScript,
-        zodiacTempInputPath,
-        zodiacTempOutputPath,
-      ]);
-      console.log('띠그림 배경 제거 완료');
-    } catch (error) {
-      console.error('띠그림 배경 제거 실패:', error);
-      throw error;
-    }
-
-    // 배경 제거된 띠그림 로드
-    const zodiacImageBuffer = readFileSync(zodiacTempOutputPath);
+    // 띠그림 로드 (배경 제거 없음)
+    const zodiacImageBuffer = readFileSync(zodiacImagePath);
     const zodiacBase64 = zodiacImageBuffer.toString('base64');
     console.log('띠그림 로드 완료');
 
@@ -104,17 +86,8 @@ export async function POST(request: NextRequest) {
 
     console.log('PNG 변환 완료');
 
-    // 배경 제거 (최종 이미지에서 텍스트 배경 처리)
-    const { stdout } = await execFileAsync('python', [
-      pythonScript,
-      pngPath,
-      outputPath,
-    ]);
-
-    console.log('배경 제거 완료:', stdout);
-
-    // 결과 반환
-    const resultBuffer = readFileSync(outputPath);
+    // 결과 반환 (배경 제거 없음)
+    const resultBuffer = readFileSync(pngPath);
     const base64 = resultBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
 

@@ -62,22 +62,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 배경 제거
-    const outputPath = join(tmpdir(), `phrase_${Date.now()}.png`);
-    tempFiles.push(outputPath);
-
-    const pythonScript = join(process.cwd(), 'scripts', 'remove_bg.py');
-
-    console.log('배경 제거 중...');
-    await execFileAsync('python', [
-      pythonScript,
-      imageAbsPath,
-      outputPath,
-    ]);
-
-    console.log('배경 제거 완료');
-
-    // 결과 읽기
-    const resultBuffer = readFileSync(outputPath);
+    // 결과 읽기 (배경 제거 없음)
+    const resultBuffer = readFileSync(imageAbsPath);
     const base64 = resultBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
 

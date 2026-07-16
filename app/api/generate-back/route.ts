@@ -58,18 +58,8 @@ export async function POST(request: NextRequest) {
 
     console.log('PNG 변환 완료');
 
-    // 배경 제거 (흰색 배경만 제거)
-    const pythonScript = join(process.cwd(), 'scripts', 'remove_bg.py');
-    const { stdout } = await execFileAsync('python', [
-      pythonScript,
-      pngPath,
-      outputPath,
-    ]);
-
-    console.log('배경 제거 완료:', stdout);
-
-    // 결과 이미지 읽기
-    const resultBuffer = readFileSync(outputPath);
+    // 결과 이미지 읽기 (배경 제거 없음)
+    const resultBuffer = readFileSync(pngPath);
     const base64 = resultBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
 
