@@ -118,7 +118,7 @@ export default function DesignPanel({
         const response = await fetch('/api/generate-front', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, birthYear, zodiac }),
+          body: JSON.stringify({ name, birthYear, zodiac, clothColor }),
         });
 
         const result = await response.json();

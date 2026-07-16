@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import KonvaCanvas from './KonvaCanvas';
-import DesignPanel from './DesignPanel';
+import ImageDesignPanel from './ImageDesignPanel';
 
 interface DesignElement {
   id: string;
@@ -16,7 +16,7 @@ interface DesignElement {
   src: string;
 }
 
-export default function ClothDesigner() {
+export default function ImageDesigner() {
   const [elements, setElements] = useState<DesignElement[]>([]);
   const [clothColor, setClothColor] = useState('white');
 
@@ -36,10 +36,10 @@ export default function ClothDesigner() {
     'sky': '/back-images/sky_back.png',
   };
 
-  const clothImageUrl = frontImageMap[clothColor] || frontImageMap['white'];
+  const frontImageUrl = frontImageMap[clothColor] || frontImageMap['white'];
   const backImageUrl = backImageMap[clothColor] || backImageMap['white'];
 
-  const handleAddFrontDesign = (result: any) => {
+  const handleAddFrontImage = (result: any) => {
     const newElement: DesignElement = {
       id: Date.now().toString(),
       type: 'image',
@@ -54,7 +54,7 @@ export default function ClothDesigner() {
     setElements([...elements, newElement]);
   };
 
-  const handleAddBackDesign = (result: any) => {
+  const handleAddBackImage = (result: any) => {
     const newElement: DesignElement = {
       id: Date.now().toString(),
       type: 'image',
@@ -86,11 +86,11 @@ export default function ClothDesigner() {
     <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
       {/* 왼쪽 패널 */}
       <div className="lg:col-span-1">
-        <DesignPanel
+        <ImageDesignPanel
           clothColor={clothColor}
           onClothColorChange={setClothColor}
-          onAddFrontDesign={handleAddFrontDesign}
-          onAddBackDesign={handleAddBackDesign}
+          onAddFrontImage={handleAddFrontImage}
+          onAddBackImage={handleAddBackImage}
         />
 
         {elements.length > 0 && (
@@ -117,7 +117,7 @@ export default function ClothDesigner() {
           <KonvaCanvas
             elements={frontElements}
             clothColor={clothColor}
-            clothImageUrl={clothImageUrl}
+            clothImageUrl={frontImageUrl}
             onUpdateElement={handleUpdateElement}
             onDeleteElement={handleDeleteElement}
           />

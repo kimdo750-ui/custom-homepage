@@ -2,18 +2,20 @@
 
 import ClothDesigner from '../components/ClothDesigner';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const [showDesigner, setShowDesigner] = useState(false);
+  const [showDesigner, setShowDesigner] = useState<'none' | 'text' | 'image'>('none');
+  const router = useRouter();
 
-  if (showDesigner) {
+  if (showDesigner !== 'none') {
     return (
       <div style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
         <header style={{ background: '#ffffff', borderBottom: '1px solid #e8e8e8', padding: '12px 0', position: 'sticky', top: 0, zIndex: 40 }}>
           <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1a1a1a', textDecoration: 'none' }}>우리이야기</h1>
             <button
-              onClick={() => setShowDesigner(false)}
+              onClick={() => setShowDesigner('none')}
               style={{ padding: '10px 20px', background: '#f0f0f0', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px', fontWeight: 500 }}
               onMouseOver={(e) => (e.target as HTMLButtonElement).style.background = '#e8e8e8'}
               onMouseOut={(e) => (e.target as HTMLButtonElement).style.background = '#f0f0f0'}
@@ -24,7 +26,13 @@ export default function Home() {
         </header>
         <main style={{ minHeight: '100vh', background: '#ffffff' }}>
           <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px' }}>
-            <ClothDesigner />
+            {showDesigner === 'text' && <ClothDesigner />}
+            {showDesigner === 'image' && (
+              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                <p style={{ fontSize: '16px', color: '#666', marginBottom: '20px' }}>이미지 디자이너로 이동합니다...</p>
+                {typeof window !== 'undefined' && router.push('/designer-image')}
+              </div>
+            )}
           </div>
         </main>
       </div>
@@ -38,7 +46,7 @@ export default function Home() {
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1a1a1a', textDecoration: 'none' }}>우리이야기</h1>
           <button
-            onClick={() => setShowDesigner(true)}
+            onClick={() => setShowDesigner('text')}
             style={{ padding: '12px 30px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, transition: 'all 0.2s' }}
             onMouseOver={(e) => (e.target as HTMLButtonElement).style.opacity = '0.9'}
             onMouseOut={(e) => (e.target as HTMLButtonElement).style.opacity = '1'}
@@ -59,7 +67,7 @@ export default function Home() {
             세상에 하나뿐인 티셔츠를 만들어보세요
           </p>
           <button
-            onClick={() => setShowDesigner(true)}
+            onClick={() => setShowDesigner('text')}
             style={{ display: 'inline-block', background: '#e74c3c', color: 'white', padding: '14px 40px', borderRadius: '4px', textDecoration: 'none', fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s' }}
             onMouseOver={(e) => (e.target as HTMLButtonElement).style.opacity = '0.9'}
             onMouseOut={(e) => (e.target as HTMLButtonElement).style.opacity = '1'}
@@ -91,39 +99,62 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 프로세스 */}
-      <section style={{ padding: '60px 20px', background: '#ffffff' }}>
+      {/* 디자인 방식 선택 */}
+      <section style={{ padding: '60px 20px', background: '#f9f9f9' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '28px', fontWeight: 700, textAlign: 'center', marginBottom: '40px', color: '#1a1a1a' }}>
-            4단계로 완성하기
+            두 가지 방식으로 디자인하기
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px' }}>
             {[
-              { step: 1, title: '옷 색상 선택', desc: '6가지 색상 중 선택' },
-              { step: 2, title: '앞면 디자인', desc: '이름과 출생년도 입력' },
-              { step: 3, title: '뒷면 디자인', desc: '명언 또는 문구 선택/입력' },
-              { step: 4, title: '위치 조정', desc: '드래그해서 배치 완성' },
-            ].map((item) => (
-              <div key={item.step} style={{ textAlign: 'center' }}>
-                <div
+              {
+                emoji: '✨',
+                title: '문구로 디자인',
+                desc: '이름, 출생년도, 명언을 입력하여 세상에 하나뿐인 티셔츠 제작',
+                steps: ['옷 색상 선택', '이름과 출생년도 입력', '명언 또는 문구 선택', '위치 조정'],
+                action: () => setShowDesigner('text'),
+              },
+              {
+                emoji: '🖼️',
+                title: '이미지로 디자인',
+                desc: '고객이 제공한 이미지를 업로드하면 자동으로 누끼 처리되어 배치',
+                steps: ['옷 색상 선택', '앞면 이미지 업로드', '뒷면 이미지 업로드', '크기/위치 조정'],
+                action: () => router.push('/designer-image'),
+              },
+            ].map((option, idx) => (
+              <div key={idx} style={{ background: '#ffffff', padding: '30px', borderRadius: '4px', border: '1px solid #e8e8e8', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ fontSize: '48px', marginBottom: '16px' }}>{option.emoji}</div>
+                <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '12px', color: '#1a1a1a' }}>{option.title}</h3>
+                <p style={{ fontSize: '14px', color: '#666', marginBottom: '20px', flex: 1, lineHeight: 1.6 }}>{option.desc}</p>
+                <div style={{ marginBottom: '20px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 600, color: '#999', marginBottom: '8px' }}>단계:</p>
+                  <ol style={{ fontSize: '13px', color: '#666', lineHeight: 1.8, paddingLeft: '20px' }}>
+                    {option.steps.map((step, i) => (
+                      <li key={i}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+                <button
+                  onClick={option.action}
                   style={{
-                    width: '60px',
-                    height: '60px',
-                    borderRadius: '50%',
-                    margin: '0 auto 16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    display: 'block',
                     background: '#e74c3c',
                     color: 'white',
-                    fontWeight: 700,
-                    fontSize: '24px',
+                    padding: '14px 30px',
+                    borderRadius: '4px',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    width: '100%',
+                    transition: 'all 0.2s'
                   }}
+                  onMouseOver={(e) => (e.target as HTMLButtonElement).style.opacity = '0.9'}
+                  onMouseOut={(e) => (e.target as HTMLButtonElement).style.opacity = '1'}
                 >
-                  {item.step}
-                </div>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px', color: '#1a1a1a' }}>{item.title}</h3>
-                <p style={{ fontSize: '13px', color: '#666' }}>{item.desc}</p>
+                  {option.title} →
+                </button>
               </div>
             ))}
           </div>
@@ -136,7 +167,7 @@ export default function Home() {
           <h2 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '16px' }}>세상에 하나뿐인 티셔츠</h2>
           <p style={{ fontSize: '16px', marginBottom: '24px', opacity: 0.9 }}>지금 바로 당신의 이야기를 디자인해보세요</p>
           <button
-            onClick={() => setShowDesigner(true)}
+            onClick={() => setShowDesigner('text')}
             style={{ padding: '14px 40px', background: 'white', color: '#e74c3c', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, transition: 'all 0.2s' }}
             onMouseOver={(e) => (e.target as HTMLButtonElement).style.opacity = '0.9'}
             onMouseOut={(e) => (e.target as HTMLButtonElement).style.opacity = '1'}

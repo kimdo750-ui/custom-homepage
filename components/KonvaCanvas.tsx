@@ -52,8 +52,14 @@ export default function KonvaCanvas({
     centerY: number;
     startAngle: number;
   } | null>(null);
+  const [pinching, setPinching] = useState<{
+    id: string;
+    startDistance: number;
+    startWidth: number;
+    startHeight: number;
+  } | null>(null);
 
-  const CANVAS_WIDTH = 480;
+  const CANVAS_WIDTH = typeof window !== 'undefined' && window.innerWidth < 768 ? window.innerWidth - 40 : 480;
   const [CANVAS_HEIGHT, setCANVAS_HEIGHT] = useState(1143);
 
   // 옷 이미지 로드
@@ -371,6 +377,134 @@ export default function KonvaCanvas({
     setDragging(null);
     setResizing(null);
     setRotating(null);
+    setPinching(null);
+  };
+
+  const getDistance = (touch1: Touch, touch2: Touch) => {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+
+    // 핀치 제스처 (두 손가락)
+    if (e.touches.length === 2 && selectedId) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = getDistance(touch1, touch2);
+      const element = elements.find((el) => el.id === selectedId);
+
+      if (element) {
+        setPinching({
+          id: selectedId,
+          startDistance: distance,
+          startWidth: element.width,
+          startHeight: element.height,
+        });
+      }
+      return;
+    }
+
+    // 일반 터치 (한 손가락)
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+
+      // 요소 선택
+      for (let i = elements.length - 1; i >= 0; i--) {
+        const element = elements[i];
+        const resizeHandleSize = 45; // 모바일은 더 크게
+
+        // 리사이즈 핸들 우선 확인
+        if (
+          x >= element.x + element.width - resizeHandleSize &&
+          x <= element.x + element.width + 5 &&
+          y >= element.y + element.height - resizeHandleSize &&
+          y <= element.y + element.height + 5
+        ) {
+          setSelectedId(element.id);
+          setResizing({
+            id: element.id,
+            startX: x,
+            startY: y,
+            startWidth: element.width,
+            startHeight: element.height,
+          });
+          return;
+        }
+
+        // 요소 내부 확인
+        if (
+          x >= element.x &&
+          x <= element.x + element.width &&
+          y >= element.y &&
+          y <= element.y + element.height
+        ) {
+          setSelectedId(element.id);
+          setDragging({
+            id: element.id,
+            startX: x - element.x,
+            startY: y - element.y,
+          });
+          return;
+        }
+      }
+
+      setSelectedId(null);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+
+    // 핀치 제스처
+    if (e.touches.length === 2 && pinching) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = getDistance(touch1, touch2);
+      const scale = distance / pinching.startDistance;
+
+      if (onUpdateElement) {
+        onUpdateElement(pinching.id, {
+          width: Math.max(50, pinching.startWidth * scale),
+          height: Math.max(50, pinching.startHeight * scale),
+        });
+      }
+      return;
+    }
+
+    // 일반 터치 드래그/리사이즈
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+
+      if (resizing && onUpdateElement) {
+        const deltaX = x - resizing.startX;
+        const deltaY = y - resizing.startY;
+        const scale = Math.min(deltaX, deltaY) / Math.min(resizing.startWidth, resizing.startHeight);
+        onUpdateElement(resizing.id, {
+          width: Math.max(50, resizing.startWidth + deltaX),
+          height: Math.max(50, resizing.startHeight + deltaY),
+        });
+      }
+
+      if (dragging && onUpdateElement) {
+        onUpdateElement(dragging.id, {
+          x: Math.max(0, x - dragging.startX),
+          y: Math.max(0, y - dragging.startY),
+        });
+      }
+    }
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -400,25 +534,38 @@ export default function KonvaCanvas({
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleMouseUp}
           onContextMenu={handleContextMenu}
-          className="cursor-default"
-          style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT, display: 'block', border: '2px solid #ddd' }}
+          className="cursor-default touch-none"
+          style={{ width: '100%', height: 'auto', display: 'block', border: '2px solid #ddd', maxWidth: '100%' }}
         />
       </div>
 
       {/* 조작 안내 및 삭제 버튼 */}
       <div className="bg-white rounded-lg shadow p-4">
-        <div className="text-sm text-gray-600 space-y-1 mb-3">
-          <p>✓ 클릭: 선택</p>
-          <p>✓ 드래그: 위치 이동</p>
-          <p>✓ 우측하단 핸들: 크기 조절</p>
-          <p>✓ 상단 원형 핸들: 회전 (Shift+드래그도 가능)</p>
+        <div className="text-xs sm:text-sm text-gray-600 space-y-1 mb-3">
+          {/* 모바일 */}
+          <div className="block sm:hidden">
+            <p>📱 터치로 선택</p>
+            <p>👆 드래그: 위치 이동</p>
+            <p>👌 핀치 (두 손가락): 크기 조절</p>
+            <p>🔄 우측하단 핸들: 크기 조절</p>
+          </div>
+          {/* 데스크톱 */}
+          <div className="hidden sm:block">
+            <p>✓ 클릭: 선택</p>
+            <p>✓ 드래그: 위치 이동</p>
+            <p>✓ 우측하단 핸들: 크기 조절</p>
+            <p>✓ 상단 원형 핸들: 회전 (Shift+드래그도 가능)</p>
+          </div>
         </div>
 
         {selectedId && (
           <button
             onClick={handleDelete}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition"
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 sm:py-2 text-base sm:text-sm rounded-lg transition active:scale-95"
           >
             🗑️ 삭제 (우클릭도 가능)
           </button>
