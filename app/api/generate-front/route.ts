@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const bodyText = await request.text();
     console.log('Raw body text:', bodyText);
 
-    let body = {};
+    let body: any = {};
     if (bodyText) {
       try {
         body = JSON.parse(bodyText);

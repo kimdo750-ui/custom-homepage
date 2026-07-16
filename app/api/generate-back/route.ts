@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   const tempFiles: string[] = [];
 
   try {
-    const body = await request.json();
+    const body: any = await request.json();
     console.log('Received body:', body);
 
     const { text } = body;
