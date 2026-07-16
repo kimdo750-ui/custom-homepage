@@ -538,7 +538,7 @@ export default function KonvaCanvas({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleMouseUp}
           onContextMenu={handleContextMenu}
-          className="cursor-default touch-none"
+          className="touch-none"
           style={{ width: '100%', height: 'auto', display: 'block', border: '2px solid #ddd', maxWidth: '100%' }}
         />
       </div>
