@@ -8,3 +8,19 @@
   },
   "buildCommand": "python --version && npm run build"
 }
+{
+  "buildCommand": "python --version && npm run build",
+  "functions": {
+    "scripts/**/*.py": {
+      "runtime": "python3.9"
+    }
+  }
+}
+{
+  "buildCommand": "npm run build",
+  "functions": {
+    "scripts/**/*.py": {
+      "runtime": "python3.9"
+    }
+  }
+}
