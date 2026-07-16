@@ -1,12 +1,18 @@
 'use client';
 
 import ClothDesigner from '../components/ClothDesigner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [showDesigner, setShowDesigner] = useState<'none' | 'text' | 'image'>('none');
   const router = useRouter();
+
+  useEffect(() => {
+    if (showDesigner === 'image') {
+      router.push('/designer-image');
+    }
+  }, [showDesigner, router]);
 
   if (showDesigner !== 'none') {
     return (
@@ -30,7 +36,6 @@ export default function Home() {
             {showDesigner === 'image' && (
               <div style={{ textAlign: 'center', padding: '40px 20px' }}>
                 <p style={{ fontSize: '16px', color: '#666', marginBottom: '20px' }}>이미지 디자이너로 이동합니다...</p>
-                {typeof window !== 'undefined' && router.push('/designer-image')}
               </div>
             )}
           </div>

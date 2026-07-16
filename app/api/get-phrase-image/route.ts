@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     const pythonScript = join(process.cwd(), 'scripts', 'remove_bg.py');
 
     console.log('배경 제거 중...');
-    const { stdout } = await execFileAsync('python', [
+    await execFileAsync('python', [
       pythonScript,
       imageAbsPath,
       outputPath,

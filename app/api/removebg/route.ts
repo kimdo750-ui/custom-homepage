@@ -4,7 +4,6 @@ import { writeFileSync, readFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { promisify } from 'util';
-import sharp from 'sharp';
 
 const execFileAsync = promisify(execFile);
 
