@@ -8,12 +8,6 @@ import sharp from 'sharp';
 
 const execFileAsync = promisify(execFile);
 
-// 옷색상별 글자색 결정
-function getTextColor(clothColor: string): string {
-  const darkColors = ['black', 'red', 'sky', 'violet'];
-  return darkColors.includes(clothColor) ? '#ffffff' : '#1a1a1a';
-}
-
 export const config = {
   maxDuration: 60,
 };
@@ -36,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
     console.log('Parsed body:', body);
 
-    const { name, birthYear, zodiac, clothColor } = body;
+    const { name, birthYear, zodiac } = body;
 
     if (!name || !birthYear || !zodiac) {
       return NextResponse.json(
@@ -45,9 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('앞면 생성:', { name, birthYear, zodiac, clothColor });
-    console.log('clothColor 값:', clothColor, '타입:', typeof clothColor);
-    console.log('textColor 계산:', getTextColor(clothColor || 'white'));
+    console.log('앞면 생성:', { name, birthYear, zodiac });
 
     // 띠그림 로드
     const zodiacName = zodiac?.replace(/띠$/, '') || '';
@@ -88,15 +80,12 @@ export async function POST(request: NextRequest) {
     const zodiacBase64 = zodiacImageBuffer.toString('base64');
     console.log('띠그림 로드 완료');
 
-    // 옷색상에 따른 글자색 결정 (출생년도, 이름 동일)
-    const textColor = getTextColor(clothColor || 'white');
-
-    // SVG 생성 (띠그림 포함, 흰색 배경)
+    // SVG 생성 (띠그림 포함, 흰색 배경, 글자는 검정색 고정)
     const svgContent = `<svg width="600" height="480" xmlns="http://www.w3.org/2000/svg">
   <rect width="600" height="480" fill="white"/>
-  <text x="300" y="50" font-family="Noto Sans KR, sans-serif" font-size="40" font-weight="700" text-anchor="middle" fill="${textColor}">${birthYear}년생</text>
+  <text x="300" y="50" font-family="Noto Sans KR, sans-serif" font-size="40" font-weight="700" text-anchor="middle" fill="#1a1a1a">${birthYear}년생</text>
   <image x="150" y="100" width="300" height="300" href="data:image/png;base64,${zodiacBase64}"/>
-  <text x="300" y="450" font-family="Noto Sans KR, sans-serif" font-size="58" font-weight="700" text-anchor="middle" fill="${textColor}">${name}</text>
+  <text x="300" y="450" font-family="Noto Sans KR, sans-serif" font-size="58" font-weight="700" text-anchor="middle" fill="#1a1a1a">${name}</text>
 </svg>`;
 
     const svgPath = join(tmpdir(), `front_${Date.now()}.svg`);
