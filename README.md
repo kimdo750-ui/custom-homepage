@@ -139,3 +139,4 @@ npm install --force
 **API 키 오류:**
 - .env.local 파일 존재 확인
 - 올바른 Google API 키 확인
+# Image deployment fix
