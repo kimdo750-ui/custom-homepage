@@ -29,9 +29,9 @@ def remove_background(input_path, output_path):
         # BGR을 HSV로 변환
         hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
 
-        # 흰색 배경 감지 (정확한 범위)
-        lower_white = np.array([0, 0, 180])
-        upper_white = np.array([180, 30, 255])
+        # 흰색 배경 감지 (순수 흰색만 - 더 엄격한 범위)
+        lower_white = np.array([0, 0, 240])
+        upper_white = np.array([180, 15, 255])
 
         # 마스크 생성
         mask = cv2.inRange(hsv, lower_white, upper_white)

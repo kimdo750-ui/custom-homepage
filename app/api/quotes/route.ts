@@ -93,16 +93,18 @@ function extractQuotesWithRegex(dataStr: string): QuotesData {
 function getDefaultQuotes(): QuotesData {
   return {
     love: [
-      { text: '사랑은 모든 것을 이긴다', source: '베르길리우스' },
+      { text: '사랑은 모든것을 이긴다', source: '베르길리우스' },
+      { text: '사랑이 없는곳에 사랑을 심어라', source: '간디' },
+      { text: '사랑은 주는것이다', source: '레오나르도 다빈치' },
     ],
     friend: [
       { text: '우정은 영혼의 나침반', source: '셰익스피어' },
     ],
     success: [
-      { text: '성공은 노력의 결과', source: '명언' },
+      { text: '성공은 준비와 기회의 만남이다', source: '명언' },
     ],
     challenge: [
-      { text: '도전하지 않으면 성공도 없다', source: '명언' },
+      { text: '하면 된다', source: '명언' },
     ],
     happy: [
       { text: '행복은 마음가짐에서 온다', source: '명언' },
@@ -122,9 +124,10 @@ export async function GET() {
 
     // 프리셋 명언 목록
     const presetQuotes = [
-      '사랑은 모든 것을 이긴다',
+      '사랑은 모든것을 이긴다',
+      '사랑이 없는곳에 사랑을 심어라',
+      '사랑은 주는것이다',
       '성공은 준비와 기회의 만남이다',
-      '우정은 영혼과 영혼의 만남이다',
       '하면 된다',
     ];
 

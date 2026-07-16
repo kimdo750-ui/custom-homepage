@@ -45,8 +45,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('앞면 생성:', { name, birthYear, zodiac });
-    console.log('각 변수 값:', { name, birthYear, zodiac, clothColor });
+    console.log('앞면 생성:', { name, birthYear, zodiac, clothColor });
+    console.log('clothColor 값:', clothColor, '타입:', typeof clothColor);
+    console.log('textColor 계산:', getTextColor(clothColor || 'white'));
 
     // 띠그림 로드
     const zodiacName = zodiac?.replace(/띠$/, '') || '';
