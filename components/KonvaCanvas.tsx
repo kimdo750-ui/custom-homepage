@@ -387,12 +387,7 @@ export default function KonvaCanvas({
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-
-    // 핀치 제스처 (두 손가락)
+    // 핀치 제스처 (두 손가락 줌)
     if (e.touches.length === 2 && selectedId) {
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
@@ -410,53 +405,18 @@ export default function KonvaCanvas({
       return;
     }
 
-    // 일반 터치 (한 손가락)
+    // 한 손가락 터치를 마우스 이벤트로 변환
     if (e.touches.length === 1) {
       const touch = e.touches[0];
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
-
-      // 요소 선택
-      for (let i = elements.length - 1; i >= 0; i--) {
-        const element = elements[i];
-        const resizeHandleSize = 45; // 모바일은 더 크게
-
-        // 리사이즈 핸들 우선 확인
-        if (
-          x >= element.x + element.width - resizeHandleSize &&
-          x <= element.x + element.width + 5 &&
-          y >= element.y + element.height - resizeHandleSize &&
-          y <= element.y + element.height + 5
-        ) {
-          setSelectedId(element.id);
-          setResizing({
-            id: element.id,
-            startX: x,
-            startY: y,
-            startWidth: element.width,
-            startHeight: element.height,
-          });
-          return;
-        }
-
-        // 요소 내부 확인
-        if (
-          x >= element.x &&
-          x <= element.x + element.width &&
-          y >= element.y &&
-          y <= element.y + element.height
-        ) {
-          setSelectedId(element.id);
-          setDragging({
-            id: element.id,
-            startX: x - element.x,
-            startY: y - element.y,
-          });
-          return;
-        }
+      const mouseEvent = new MouseEvent('mousedown', {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        bubbles: true,
+      });
+      const canvas = canvasRef.current;
+      if (canvas) {
+        canvas.dispatchEvent(mouseEvent);
       }
-
-      setSelectedId(null);
     }
   };
 
@@ -464,9 +424,7 @@ export default function KonvaCanvas({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-
-    // 핀치 제스처
+    // 핀치 제스처 (크기 조정)
     if (e.touches.length === 2 && pinching) {
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
@@ -482,28 +440,15 @@ export default function KonvaCanvas({
       return;
     }
 
-    // 일반 터치 드래그/리사이즈
+    // 한 손가락 터치를 마우스 이벤트로 변환
     if (e.touches.length === 1) {
       const touch = e.touches[0];
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
-
-      if (resizing && onUpdateElement) {
-        const deltaX = x - resizing.startX;
-        const deltaY = y - resizing.startY;
-        const scale = Math.min(deltaX, deltaY) / Math.min(resizing.startWidth, resizing.startHeight);
-        onUpdateElement(resizing.id, {
-          width: Math.max(50, resizing.startWidth + deltaX),
-          height: Math.max(50, resizing.startHeight + deltaY),
-        });
-      }
-
-      if (dragging && onUpdateElement) {
-        onUpdateElement(dragging.id, {
-          x: Math.max(0, x - dragging.startX),
-          y: Math.max(0, y - dragging.startY),
-        });
-      }
+      const mouseEvent = new MouseEvent('mousemove', {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+        bubbles: true,
+      });
+      canvas.dispatchEvent(mouseEvent);
     }
   };
 
@@ -519,6 +464,17 @@ export default function KonvaCanvas({
     if (selectedId && onDeleteElement) {
       onDeleteElement(selectedId);
       setSelectedId(null);
+    }
+  };
+
+  const handleRotate = (angle: number) => {
+    if (selectedId && onUpdateElement) {
+      const element = elements.find((el) => el.id === selectedId);
+      if (element) {
+        onUpdateElement(selectedId, {
+          rotation: (element.rotation + angle) % 360,
+        });
+      }
     }
   };
 
@@ -563,12 +519,45 @@ export default function KonvaCanvas({
         </div>
 
         {selectedId && (
-          <button
-            onClick={handleDelete}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 sm:py-2 text-base sm:text-sm rounded-lg transition active:scale-95"
-          >
-            🗑️ 삭제 (우클릭도 가능)
-          </button>
+          <div className="space-y-2">
+            {/* 모바일 회전 버튼 */}
+            <div className="block sm:hidden">
+              <p className="text-xs text-gray-500 mb-2">회전:</p>
+              <div className="grid grid-cols-4 gap-2">
+                <button
+                  onClick={() => handleRotate(-45)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition active:scale-95 text-xs"
+                >
+                  ↶ 45°
+                </button>
+                <button
+                  onClick={() => handleRotate(-90)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition active:scale-95 text-xs"
+                >
+                  ↶ 90°
+                </button>
+                <button
+                  onClick={() => handleRotate(45)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition active:scale-95 text-xs"
+                >
+                  45° ↷
+                </button>
+                <button
+                  onClick={() => handleRotate(90)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition active:scale-95 text-xs"
+                >
+                  90° ↷
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={handleDelete}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 sm:py-2 text-base sm:text-sm rounded-lg transition active:scale-95"
+            >
+              🗑️ 삭제 (우클릭도 가능)
+            </button>
+          </div>
         )}
       </div>
     </div>
