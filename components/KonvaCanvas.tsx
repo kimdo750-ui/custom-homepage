@@ -198,8 +198,10 @@ export default function KonvaCanvas({
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     // 요소 선택 (뒤에서 앞으로)
     for (let i = elements.length - 1; i >= 0; i--) {
@@ -288,8 +290,10 @@ export default function KonvaCanvas({
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     if (rotating) {
       const element = elements.find((el) => el.id === rotating.id);
@@ -391,6 +395,8 @@ export default function KonvaCanvas({
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
     // 핀치 제스처 (두 손가락)
     if (e.touches.length === 2 && selectedId) {
@@ -413,8 +419,8 @@ export default function KonvaCanvas({
     // 일반 터치 (한 손가락)
     if (e.touches.length === 1) {
       const touch = e.touches[0];
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
+      const x = (touch.clientX - rect.left) * scaleX;
+      const y = (touch.clientY - rect.top) * scaleY;
 
       // 요소 선택
       for (let i = elements.length - 1; i >= 0; i--) {
@@ -465,6 +471,8 @@ export default function KonvaCanvas({
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
     // 핀치 제스처
     if (e.touches.length === 2 && pinching) {
@@ -485,8 +493,8 @@ export default function KonvaCanvas({
     // 일반 터치 드래그/리사이즈
     if (e.touches.length === 1) {
       const touch = e.touches[0];
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
+      const x = (touch.clientX - rect.left) * scaleX;
+      const y = (touch.clientY - rect.top) * scaleY;
 
       if (resizing && onUpdateElement) {
         const deltaX = x - resizing.startX;
