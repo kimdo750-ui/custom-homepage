@@ -78,21 +78,32 @@ export default function KonvaCanvas({
 
   // 디자인 요소 이미지 로드
   useEffect(() => {
+    console.log('이미지 로드 시작, 요소 수:', elements.length);
+
     elements.forEach((element) => {
+      console.log('요소 확인:', element.id, '이미지 캐시됨:', !!images[element.id]);
+
       if (!images[element.id]) {
+        console.log('새로운 이미지 로드:', element.id);
         const img = new Image();
         img.crossOrigin = 'anonymous';
-        img.src = element.src;
 
         img.onload = () => {
-          console.log('이미지 로드 성공:', element.id, '크기:', img.width, 'x', img.height);
+          console.log('✅ 이미지 로드 성공:', element.id, '크기:', img.width, 'x', img.height);
           setImages((prev) => ({ ...prev, [element.id]: img }));
         };
 
         img.onerror = (error) => {
-          console.error('이미지 로드 실패:', element.id, error);
-          // Base64 이미지가 손상되었을 수 있음
+          console.error('❌ 이미지 로드 실패:', element.id, error);
+          console.error('Src:', element.src.substring(0, 100) + '...');
         };
+
+        // Base64 유효성 확인
+        if (element.src.startsWith('data:image')) {
+          console.log('Base64 이미지 감지');
+        }
+
+        img.src = element.src;
       }
     });
   }, [elements, images]);
