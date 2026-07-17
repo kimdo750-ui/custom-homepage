@@ -52,9 +52,9 @@ export default function Home() {
           <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1a1a1a', textDecoration: 'none' }}>우리이야기</h1>
           <button
             onClick={() => setShowDesigner('text')}
-            style={{ padding: '12px 30px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, transition: 'all 0.2s' }}
-            onMouseOver={(e) => (e.target as HTMLButtonElement).style.opacity = '0.9'}
-            onMouseOut={(e) => (e.target as HTMLButtonElement).style.opacity = '1'}
+            style={{ padding: '12px 30px', background: '#2563EB', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, transition: 'all 0.2s' }}
+            onMouseOver={(e) => (e.target as HTMLButtonElement).style.background = '#1D4ED8'}
+            onMouseOut={(e) => (e.target as HTMLButtonElement).style.background = '#2563EB'}
           >
             디자인 시작하기
           </button>
@@ -73,9 +73,9 @@ export default function Home() {
           </p>
           <button
             onClick={() => setShowDesigner('text')}
-            style={{ display: 'inline-block', background: '#e74c3c', color: 'white', padding: '14px 40px', borderRadius: '4px', textDecoration: 'none', fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s' }}
-            onMouseOver={(e) => (e.target as HTMLButtonElement).style.opacity = '0.9'}
-            onMouseOut={(e) => (e.target as HTMLButtonElement).style.opacity = '1'}
+            style={{ display: 'inline-block', background: '#2563EB', color: 'white', padding: '14px 40px', borderRadius: '6px', textDecoration: 'none', fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s' }}
+            onMouseOver={(e) => (e.target as HTMLButtonElement).style.background = '#1D4ED8'}
+            onMouseOut={(e) => (e.target as HTMLButtonElement).style.background = '#2563EB'}
           >
             지금 만들어보기 →
           </button>
@@ -143,10 +143,10 @@ export default function Home() {
                   onClick={option.action}
                   style={{
                     display: 'block',
-                    background: '#e74c3c',
+                    background: '#2563EB',
                     color: 'white',
                     padding: '14px 30px',
-                    borderRadius: '4px',
+                    borderRadius: '6px',
                     textDecoration: 'none',
                     fontWeight: 600,
                     border: 'none',
@@ -155,8 +155,8 @@ export default function Home() {
                     width: '100%',
                     transition: 'all 0.2s'
                   }}
-                  onMouseOver={(e) => (e.target as HTMLButtonElement).style.opacity = '0.9'}
-                  onMouseOut={(e) => (e.target as HTMLButtonElement).style.opacity = '1'}
+                  onMouseOver={(e) => (e.target as HTMLButtonElement).style.background = '#1D4ED8'}
+                  onMouseOut={(e) => (e.target as HTMLButtonElement).style.background = '#2563EB'}
                 >
                   {option.title} →
                 </button>
@@ -167,13 +167,13 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '60px 20px', background: '#e74c3c' }}>
+      <section style={{ padding: '60px 20px', background: '#2563EB' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', textAlign: 'center', color: 'white' }}>
           <h2 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '16px' }}>세상에 하나뿐인 티셔츠</h2>
           <p style={{ fontSize: '16px', marginBottom: '24px', opacity: 0.9 }}>지금 바로 당신의 이야기를 디자인해보세요</p>
           <button
             onClick={() => setShowDesigner('text')}
-            style={{ padding: '14px 40px', background: 'white', color: '#e74c3c', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, transition: 'all 0.2s' }}
+            style={{ padding: '14px 40px', background: 'white', color: '#2563EB', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, transition: 'all 0.2s' }}
             onMouseOver={(e) => (e.target as HTMLButtonElement).style.opacity = '0.9'}
             onMouseOut={(e) => (e.target as HTMLButtonElement).style.opacity = '1'}
           >

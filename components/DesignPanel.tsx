@@ -196,25 +196,25 @@ export default function DesignPanel({
         <h3 className="text-lg font-semibold mb-4 text-gray-900">👤 앞면</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">이름</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">이름</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="예: 김동일"
-              className="w-full px-3 py-2 text-sm"
+              className="w-full px-3 py-2 text-sm text-gray-900 placeholder-gray-500"
               maxLength={10}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">출생년도</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">출생년도</label>
             <input
               type="number"
               value={birthYear}
               onChange={handleBirthYearChange}
               placeholder="예: 1990"
-              className="w-full px-3 py-2 text-sm"
+              className="w-full px-3 py-2 text-sm text-gray-900 placeholder-gray-500"
               min={1900}
               max={2024}
             />

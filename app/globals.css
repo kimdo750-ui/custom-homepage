@@ -37,11 +37,17 @@ button:disabled {
 
 /* 입력창 기본 스타일 */
 input, textarea, select {
-  @apply rounded-lg border border-gray-300 outline-none transition-all;
+  @apply rounded-lg border border-gray-300 outline-none transition-all text-gray-900;
+  background-color: #F9FAFB;
+}
+
+input::placeholder, textarea::placeholder, select::placeholder {
+  @apply text-gray-500;
 }
 
 input:focus, textarea:focus, select:focus {
   border-color: #3B82F6;
+  background-color: #FFFFFF;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
