@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFileSync, mkdirSync } from 'fs';
-import { join } from 'path';
-import { existsSync } from 'fs';
 
-export const config = {
-  maxDuration: 60,
-};
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,30 +31,17 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // 파일명 생성 (중복 방지)
-    const timestamp = Date.now();
-    const filename = `image_${timestamp}_${file.name.replace(/\s+/g, '_')}`;
-    const uploadsDir = join(process.cwd(), 'public', 'uploads');
+    // Base64로 변환
+    const base64 = buffer.toString('base64');
+    const dataUrl = `data:${file.type};base64,${base64}`;
 
-    // uploads 폴더 생성 (없으면)
-    if (!existsSync(uploadsDir)) {
-      mkdirSync(uploadsDir, { recursive: true });
-    }
-
-    // 파일 저장
-    const filepath = join(uploadsDir, filename);
-    writeFileSync(filepath, buffer);
-
-    console.log('파일 저장 완료:', filepath);
-
-    // 저장된 파일 URL 반환
-    const fileUrl = `/uploads/${filename}`;
+    console.log('Base64 변환 완료, 크기:', dataUrl.length);
 
     return NextResponse.json({
       success: true,
-      filename,
-      fileUrl,
-      message: '이미지가 저장되었습니다',
+      filename: file.name,
+      imageData: dataUrl,
+      message: '이미지가 변환되었습니다',
     });
 
   } catch (error) {

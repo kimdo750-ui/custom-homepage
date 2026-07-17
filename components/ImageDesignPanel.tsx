@@ -75,15 +75,15 @@ export default function ImageDesignPanel({
 
       const uploadResult = await uploadResponse.json();
 
-      if (uploadResult.fileUrl && callback) {
-        // 저장된 파일 경로로 콜백
+      if (uploadResult.imageData && callback) {
+        // Base64 이미지 데이터로 콜백
         callback({
-          imageUrl: uploadResult.fileUrl,
+          imageUrl: uploadResult.imageData,
           filename: uploadResult.filename,
           message: uploadResult.message,
         });
 
-        console.log('파일 저장 완료:', uploadResult.fileUrl);
+        console.log('Base64 변환 완료, 크기:', uploadResult.imageData.length);
       }
     } catch (error) {
       console.error('Error:', error);
