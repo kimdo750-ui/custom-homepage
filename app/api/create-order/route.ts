@@ -3,14 +3,18 @@ import { MongoClient } from 'mongodb';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  throw new Error('MONGODB_URI이 설정되지 않았습니다');
-}
-
 export async function POST(request: NextRequest) {
   let client: MongoClient | null = null;
 
   try {
+    // MongoDB URI 확인
+    if (!MONGODB_URI) {
+      return NextResponse.json(
+        { error: 'MongoDB 연결 설정이 필요합니다' },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
 
     const {
