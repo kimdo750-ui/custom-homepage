@@ -51,31 +51,39 @@ export default function ImageDesignPanel({
       };
       reader.readAsDataURL(file);
 
-      // Remove.bg API로 누끼 처리
-      const formData = new FormData();
-      formData.append('image_file', file);
+      // 이미지 저장
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
 
-      console.log('파일 전송:', {
+      console.log('파일 업로드:', {
         name: file.name,
         type: file.type,
         size: file.size,
       });
 
-      const response = await fetch('/api/removebg', {
+      const uploadResponse = await fetch('/api/upload-image', {
         method: 'POST',
-        body: formData,
+        body: uploadFormData,
       });
 
-      console.log('API 응답:', response.status);
+      console.log('업로드 응답:', uploadResponse.status);
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || '누끼 처리 실패');
+      if (!uploadResponse.ok) {
+        const error = await uploadResponse.json();
+        throw new Error(error.error || '파일 저장 실패');
       }
 
-      const result = await response.json();
-      if (result.imageUrl && callback) {
-        callback(result);
+      const uploadResult = await uploadResponse.json();
+
+      if (uploadResult.fileUrl && callback) {
+        // 저장된 파일 경로로 콜백
+        callback({
+          imageUrl: uploadResult.fileUrl,
+          filename: uploadResult.filename,
+          message: uploadResult.message,
+        });
+
+        console.log('파일 저장 완료:', uploadResult.fileUrl);
       }
     } catch (error) {
       console.error('Error:', error);
