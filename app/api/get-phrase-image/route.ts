@@ -6,10 +6,10 @@ const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
 // 파일명 매핑
 const phraseFiles: Record<string, string> = {
-  '사랑으로 모든 것을 이기다': 'love_001.png',
-  '자랑이 없는 곳에 자랑을 심어라': 'love_002.png',
-  '사랑으로 주는 것이다': 'love_003.png',
-  '우정은 여홍과 여홍의 만남이다': 'friendship_001.png',
+  '사랑은 모든것을 이긴다': 'love_001.png',
+  '사랑은 주는것이다': 'love_002.png',
+  '사랑이 없는곳에 사랑을 심어라': 'love_003.png',
+  '우정은 영혼과 영혼의 만남이다': 'friendship_001.png',
 };
 
 export const maxDuration = 60;
