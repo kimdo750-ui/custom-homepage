@@ -58,6 +58,11 @@ export default function KonvaCanvas({
     startWidth: number;
     startHeight: number;
   } | null>(null);
+  const [twoFingerRotating, setTwoFingerRotating] = useState<{
+    id: string;
+    startRotation: number;
+    startAngle: number;
+  } | null>(null);
 
   const CANVAS_WIDTH = typeof window !== 'undefined' && window.innerWidth < 768 ? window.innerWidth - 40 : 480;
   const [CANVAS_HEIGHT, setCANVAS_HEIGHT] = useState(1143);
@@ -407,12 +412,19 @@ export default function KonvaCanvas({
     setResizing(null);
     setRotating(null);
     setPinching(null);
+    setTwoFingerRotating(null);
   };
 
   const getDistance = (touch1: Touch, touch2: Touch) => {
     const dx = touch1.clientX - touch2.clientX;
     const dy = touch1.clientY - touch2.clientY;
     return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const getAngleBetweenTouches = (touch1: Touch, touch2: Touch) => {
+    const dx = touch2.clientX - touch1.clientX;
+    const dy = touch2.clientY - touch1.clientY;
+    return Math.atan2(dy, dx) * (180 / Math.PI);
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
@@ -423,20 +435,30 @@ export default function KonvaCanvas({
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
-    // 핀치 제스처 (두 손가락)
+    // 두 손가락 제스처
     if (e.touches.length === 2 && selectedId) {
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const distance = getDistance(touch1, touch2);
+      const angle = getAngleBetweenTouches(touch1, touch2);
       const element = elements.find((el) => el.id === selectedId);
 
       if (element) {
-        setPinching({
-          id: selectedId,
-          startDistance: distance,
-          startWidth: element.width,
-          startHeight: element.height,
-        });
+        // Alt키가 눌려있으면 회전, 아니면 핀치
+        if (e.altKey) {
+          setTwoFingerRotating({
+            id: selectedId,
+            startRotation: element.rotation,
+            startAngle: angle,
+          });
+        } else {
+          setPinching({
+            id: selectedId,
+            startDistance: distance,
+            startWidth: element.width,
+            startHeight: element.height,
+          });
+        }
       }
       return;
     }
@@ -499,7 +521,22 @@ export default function KonvaCanvas({
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
-    // 핀치 제스처
+    // 두 손가락 회전
+    if (e.touches.length === 2 && twoFingerRotating) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const currentAngle = getAngleBetweenTouches(touch1, touch2);
+      const deltaAngle = currentAngle - twoFingerRotating.startAngle;
+
+      if (onUpdateElement) {
+        onUpdateElement(twoFingerRotating.id, {
+          rotation: (twoFingerRotating.startRotation + deltaAngle) % 360,
+        });
+      }
+      return;
+    }
+
+    // 핀치 제스처 (크기 조절)
     if (e.touches.length === 2 && pinching) {
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
@@ -583,8 +620,8 @@ export default function KonvaCanvas({
           <div className="block sm:hidden">
             <p>📱 터치로 선택</p>
             <p>👆 드래그: 위치 이동</p>
-            <p>👌 핀치 (두 손가락): 크기 조절</p>
-            <p>🔄 우측하단 핸들: 크기 조절</p>
+            <p>👌 두 손가락 핀치: 크기 조절</p>
+            <p>🔄 두 손가락 회전 (Alt+두 손가락): 회전</p>
           </div>
           {/* 데스크톱 */}
           <div className="hidden sm:block">

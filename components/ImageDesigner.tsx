@@ -139,9 +139,9 @@ export default function ImageDesigner() {
   const backElements = elements.filter((el) => el.position === 'back');
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 lg:gap-6 p-3 lg:p-0">
       {/* 왼쪽 패널 */}
-      <div className="lg:col-span-1">
+      <div className="lg:col-span-1 order-2 lg:order-1">
         <ImageDesignPanel
           clothColor={clothColor}
           onClothColorChange={setClothColor}
@@ -219,9 +219,9 @@ export default function ImageDesigner() {
       </div>
 
       {/* 앞면 캔버스 */}
-      <div className="lg:col-span-2">
-        <div className="bg-white rounded-lg shadow-lg p-4">
-          <h2 className="text-lg font-bold mb-3">👤 앞면</h2>
+      <div className="lg:col-span-2 order-1 lg:order-2">
+        <div className="bg-white rounded-lg shadow-lg p-3 lg:p-4">
+          <h2 className="text-base lg:text-lg font-bold mb-3">👤 앞면</h2>
           <KonvaCanvas
             elements={frontElements}
             clothColor={clothColor}
@@ -238,9 +238,9 @@ export default function ImageDesigner() {
       </div>
 
       {/* 뒷면 캔버스 */}
-      <div className="lg:col-span-2">
-        <div className="bg-white rounded-lg shadow-lg p-4">
-          <h2 className="text-lg font-bold mb-3">⭐ 뒷면</h2>
+      <div className="lg:col-span-2 order-3 lg:order-3">
+        <div className="bg-white rounded-lg shadow-lg p-3 lg:p-4">
+          <h2 className="text-base lg:text-lg font-bold mb-3">⭐ 뒷면</h2>
           <KonvaCanvas
             elements={backElements}
             clothColor={clothColor}
