@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFileSync, unlinkSync } from 'fs';
-import { join } from 'path';
-import { tmpdir } from 'os';
 import { createCanvas } from 'canvas';
 
 const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
-export const config = {
-  maxDuration: 60,
-};
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
-  let tempImagePath = '';
-
   try {
     const body: any = await request.json();
     const { text } = body;
@@ -26,13 +19,12 @@ export async function POST(request: NextRequest) {
 
     console.log('뒷면 생성:', { text });
 
-    // Canvas 생성 (1200x960 - 2배 크기)
+    // Canvas 생성 (1200x960)
     const canvas = createCanvas(1200, 960);
     const ctx = canvas.getContext('2d');
 
-    // 배경을 흰색으로 (Remove.bg API로 투명하게 처리)
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 1200, 960);
+    // 투명 배경 (알파채널 유지)
+    ctx.clearRect(0, 0, 1200, 960);
 
     // 상단 원형 장식 (2배)
     ctx.strokeStyle = '#e74c3c';

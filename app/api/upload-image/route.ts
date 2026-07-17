@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
+
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
@@ -31,16 +33,53 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Base64로 변환
+    // Remove.bg API로 배경 제거
+    if (REMOVEBG_API_KEY) {
+      try {
+        const bgFormData = new FormData();
+        bgFormData.append('image_file', new Blob([buffer], { type: file.type }), file.name);
+        bgFormData.append('size', 'auto');
+        bgFormData.append('type', 'product');
+
+        const bgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
+          method: 'POST',
+          headers: {
+            'X-Api-Key': REMOVEBG_API_KEY,
+          },
+          body: bgFormData,
+        });
+
+        if (bgResponse.ok) {
+          const bgRemovedBuffer = await bgResponse.arrayBuffer();
+          const base64 = Buffer.from(bgRemovedBuffer).toString('base64');
+          const dataUrl = `data:image/png;base64,${base64}`;
+
+          console.log('배경 제거 완료');
+
+          return NextResponse.json({
+            success: true,
+            filename: file.name,
+            imageData: dataUrl,
+            bgRemoved: true,
+            message: '이미지 배경이 제거되었습니다',
+          });
+        }
+      } catch (bgError) {
+        console.warn('배경 제거 실패, 원본 이미지 사용:', bgError);
+      }
+    }
+
+    // 배경 제거 실패 또는 API 키 없으면 원본 사용
     const base64 = buffer.toString('base64');
     const dataUrl = `data:${file.type};base64,${base64}`;
 
-    console.log('Base64 변환 완료, 크기:', dataUrl.length);
+    console.log('원본 이미지 사용 (배경 제거 미적용)');
 
     return NextResponse.json({
       success: true,
       filename: file.name,
       imageData: dataUrl,
+      bgRemoved: false,
       message: '이미지가 변환되었습니다',
     });
 

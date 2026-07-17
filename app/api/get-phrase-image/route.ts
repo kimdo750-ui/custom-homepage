@@ -46,9 +46,8 @@ export async function POST(request: NextRequest) {
     const canvas = createCanvas(600, 480);
     const ctx = canvas.getContext('2d');
 
-    // 배경을 흰색으로 (테스트용)
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 600, 480);
+    // 투명 배경 (알파채널 유지)
+    ctx.clearRect(0, 0, 600, 480);
 
     // 상단 원형 장식
     ctx.strokeStyle = '#e74c3c';
