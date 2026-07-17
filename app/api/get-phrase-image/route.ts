@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
-
-const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
+import { createCanvas } from 'canvas';
 
 // 프리셋 명언 매핑
-const phraseImages: Record<string, string> = {
-  '사랑은 모든것을 이긴다': '/phrases/love_001.png',
-  '사랑이 없는곳에 사랑을 심어라': '/phrases/love_002.png',
-  '사랑은 주는것이다': '/phrases/love_003.png',
-  '우정은 영혼과 영혼의 만남이다': '/phrases/friendship_001.png',
+const phraseTexts: Record<string, string> = {
+  '사랑은 모든것을 이긴다': '사랑은 모든것을 이긴다',
+  '사랑이 없는곳에 사랑을 심어라': '사랑이 없는곳에\n사랑을 심어라',
+  '사랑은 주는것이다': '사랑은 주는것이다',
+  '우정은 영혼과 영혼의 만남이다': '우정은 영혼과\n영혼의 만남이다',
 };
 
 export async function POST(request: NextRequest) {
@@ -25,85 +22,77 @@ export async function POST(request: NextRequest) {
 
     // 공백 제거 후 확인
     const normalizedText = text.replace(/\s+/g, '');
-    let filePath = phraseImages[text];
+    let displayText = phraseTexts[text];
 
-    if (!filePath) {
-      const matchedKey = Object.keys(phraseImages).find(
+    if (!displayText) {
+      const matchedKey = Object.keys(phraseTexts).find(
         key => key.replace(/\s+/g, '') === normalizedText
       );
       if (matchedKey) {
-        filePath = phraseImages[matchedKey];
+        displayText = phraseTexts[matchedKey];
       }
     }
 
-    if (!filePath) {
+    if (!displayText) {
       return NextResponse.json(
         { error: '프리셋 이미지를 찾을 수 없습니다', text },
         { status: 404 }
       );
     }
 
-    console.log('명언 이미지 처리:', text, filePath);
+    console.log('명언 이미지 생성:', text);
 
-    const imageAbsPath = join(process.cwd(), 'public', filePath.replace(/^\//, ''));
+    // Canvas에서 투명 배경으로 텍스트 그리기 (1200x960)
+    const canvas = createCanvas(1200, 960);
+    const ctx = canvas.getContext('2d');
 
-    if (!existsSync(imageAbsPath)) {
-      return NextResponse.json(
-        { error: '이미지 파일을 찾을 수 없습니다', filePath },
-        { status: 404 }
-      );
+    // 배경을 투명하게 유지
+    ctx.clearRect(0, 0, 1200, 960);
+
+    // 상단 원형 장식
+    ctx.strokeStyle = '#e74c3c';
+    ctx.lineWidth = 4;
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath();
+    ctx.arc(600, 160, 80, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.globalAlpha = 0.3;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(600, 160, 64, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // 텍스트
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#e74c3c';
+    ctx.textAlign = 'center';
+    ctx.font = 'italic bold 200px sans-serif';
+
+    // 줄바꿈 처리
+    const lines = displayText.split('\n');
+    let startY = 400;
+    const lineHeight = 250;
+
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], 600, startY + i * lineHeight);
     }
 
-    const resultBuffer = readFileSync(imageAbsPath);
+    // 하단 선 장식
+    ctx.strokeStyle = '#e74c3c';
+    ctx.lineWidth = 4;
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath();
+    ctx.moveTo(200, 820);
+    ctx.lineTo(1000, 820);
+    ctx.stroke();
 
-    // Remove.bg API로 배경 제거 (타임아웃 설정)
-    if (REMOVEBG_API_KEY) {
-      try {
-        const formData = new FormData();
-        formData.append('image_file', new Blob([resultBuffer]), 'phrase.png');
-        formData.append('size', 'auto');
-        formData.append('type', 'auto');
-        formData.append('format', 'auto');
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
-
-        const response = await fetch('https://api.remove.bg/v1.0/removebg', {
-          method: 'POST',
-          headers: {
-            'X-Api-Key': REMOVEBG_API_KEY,
-          },
-          body: formData,
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          const bgRemovedBuffer = await response.arrayBuffer();
-          const base64 = Buffer.from(bgRemovedBuffer).toString('base64');
-          const imageUrl = `data:image/png;base64,${base64}`;
-
-          console.log('명언 이미지 배경 제거 완료');
-
-          return NextResponse.json({
-            imageUrl,
-            cached: false,
-            text,
-            type: 'preset',
-            bgRemoved: true,
-          });
-        } else {
-          console.warn('Remove.bg API 실패 (상태:', response.status, '), 원본 반환');
-        }
-      } catch (bgError) {
-        console.warn('배경 제거 중 오류:', bgError);
-      }
-    }
-
-    // 배경 제거 실패 시 원본 반환
-    const base64 = resultBuffer.toString('base64');
+    // PNG로 변환 (투명한 배경)
+    const pngBuffer = canvas.toBuffer('image/png');
+    const base64 = pngBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
+
+    console.log('명언 이미지 생성 완료 (투명 배경)');
 
     return NextResponse.json({
       imageUrl,
