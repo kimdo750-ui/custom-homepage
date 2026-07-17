@@ -2,7 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { createCanvas } from 'canvas';
+import { createCanvas, registerFont } from 'canvas';
+
+// 한글 폰트 등록 (Noto Serif KR)
+try {
+  const fontPathSans = require.resolve('@fontsource/noto-sans-kr/files/noto-sans-kr-latin-400-normal.ttf');
+  const fontPathSerif = require.resolve('@fontsource/noto-serif-kr/files/noto-serif-kr-latin-400-normal.ttf');
+  registerFont(fontPathSans, { family: 'Noto Sans KR' });
+  registerFont(fontPathSerif, { family: 'Noto Serif KR' });
+} catch (e) {
+  console.warn('폰트 등록 실패:', e);
+}
 
 const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
