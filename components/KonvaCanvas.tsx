@@ -81,9 +81,17 @@ export default function KonvaCanvas({
     elements.forEach((element) => {
       if (!images[element.id]) {
         const img = new Image();
+        img.crossOrigin = 'anonymous';
         img.src = element.src;
+
         img.onload = () => {
+          console.log('이미지 로드 성공:', element.id, '크기:', img.width, 'x', img.height);
           setImages((prev) => ({ ...prev, [element.id]: img }));
+        };
+
+        img.onerror = (error) => {
+          console.error('이미지 로드 실패:', element.id, error);
+          // Base64 이미지가 손상되었을 수 있음
         };
       }
     });
