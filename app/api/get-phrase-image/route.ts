@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
+const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
+
 // 프리셋 명언 매핑
 const phraseImages: Record<string, string> = {
   '사랑은 모든것을 이긴다': '/phrases/love_001.png',
@@ -53,6 +55,44 @@ export async function POST(request: NextRequest) {
     }
 
     const resultBuffer = readFileSync(imageAbsPath);
+
+    // Remove.bg API로 배경 제거
+    if (REMOVEBG_API_KEY) {
+      try {
+        const formData = new FormData();
+        formData.append('image_file', new Blob([resultBuffer]), 'phrase.png');
+        formData.append('size', 'auto');
+        formData.append('type', 'auto');
+
+        const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+          method: 'POST',
+          headers: {
+            'X-Api-Key': REMOVEBG_API_KEY,
+          },
+          body: formData,
+        });
+
+        if (response.ok) {
+          const bgRemovedBuffer = await response.arrayBuffer();
+          const base64 = Buffer.from(bgRemovedBuffer).toString('base64');
+          const imageUrl = `data:image/png;base64,${base64}`;
+
+          return NextResponse.json({
+            imageUrl,
+            cached: false,
+            text,
+            type: 'preset',
+            bgRemoved: true,
+          });
+        } else {
+          console.warn('Remove.bg API 실패, 원본 이미지 반환');
+        }
+      } catch (bgError) {
+        console.warn('배경 제거 중 오류:', bgError);
+      }
+    }
+
+    // 배경 제거 실패 시 원본 반환
     const base64 = resultBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
 
@@ -61,6 +101,7 @@ export async function POST(request: NextRequest) {
       cached: false,
       text,
       type: 'preset',
+      bgRemoved: false,
     });
 
   } catch (error) {

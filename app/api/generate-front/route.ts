@@ -66,53 +66,12 @@ export async function POST(request: NextRequest) {
     ctx.font = 'bold 58px "Noto Sans KR", Arial';
     ctx.fillText(name, 300, 450);
 
-    // PNG로 변환
+    // PNG로 변환 (투명한 배경)
     const pngBuffer = canvas.toBuffer('image/png');
-    tempImagePath = join(tmpdir(), `front_${Date.now()}.png`);
-    writeFileSync(tempImagePath, pngBuffer);
 
     console.log('PNG 생성 완료');
 
-    // Remove.bg API로 배경 제거
-    if (REMOVEBG_API_KEY) {
-      try {
-        const formData = new FormData();
-        formData.append('image_file', new Blob([pngBuffer]), 'front.png');
-        formData.append('size', 'auto');
-        formData.append('type', 'auto');
-
-        const response = await fetch('https://api.remove.bg/v1.0/removebg', {
-          method: 'POST',
-          headers: {
-            'X-Api-Key': REMOVEBG_API_KEY,
-          },
-          body: formData,
-        });
-
-        if (response.ok) {
-          const bgRemovedBuffer = await response.arrayBuffer();
-          const base64 = Buffer.from(bgRemovedBuffer).toString('base64');
-          const imageUrl = `data:image/png;base64,${base64}`;
-
-          console.log('앞면 생성 완료 (배경 제거됨)');
-
-          return NextResponse.json({
-            imageUrl,
-            type: 'front',
-            name,
-            birthYear,
-            zodiac,
-            bgRemoved: true,
-          });
-        } else {
-          console.warn('Remove.bg API 실패, 원본 이미지 반환');
-        }
-      } catch (bgError) {
-        console.warn('배경 제거 중 오류:', bgError);
-      }
-    }
-
-    // 배경 제거 없이 반환
+    // 캔버스의 투명 배경으로 직접 반환 (Remove.bg 사용 안 함 - 텍스트 손상 방지)
     const base64 = pngBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
 
@@ -124,7 +83,6 @@ export async function POST(request: NextRequest) {
       name,
       birthYear,
       zodiac,
-      bgRemoved: false,
     });
 
   } catch (error) {
