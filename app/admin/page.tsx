@@ -54,6 +54,10 @@ export default function AdminPage() {
 
   const getImageArray = (imageUrl: string) => {
     if (!imageUrl) return [];
+    // Base64는 그대로, URL 경로들은 쉼표로 구분
+    if (imageUrl.startsWith('data:')) {
+      return [imageUrl];
+    }
     return imageUrl.split(',').filter(url => url.trim());
   };
 
