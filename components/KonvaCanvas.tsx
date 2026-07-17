@@ -134,13 +134,19 @@ export default function KonvaCanvas({
     ctx.strokeRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     // 요소 그리기
+    console.log('Canvas 렌더링:', CANVAS_WIDTH, 'x', CANVAS_HEIGHT, '요소 수:', elements.length);
+
     elements.forEach((element) => {
       if (images[element.id]) {
+        console.log('요소 그리기:', element.id, '위치:', element.x, element.y, '크기:', element.width, element.height);
         ctx.save();
         ctx.translate(element.x + element.width / 2, element.y + element.height / 2);
         ctx.rotate((element.rotation * Math.PI) / 180);
         ctx.drawImage(images[element.id], -element.width / 2, -element.height / 2, element.width, element.height);
         ctx.restore();
+        console.log('요소 그리기 완료');
+      } else {
+        console.warn('이미지 없음:', element.id);
       }
 
       // 선택된 요소 테두리
