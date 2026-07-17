@@ -151,7 +151,8 @@ export default function DesignPanel({
           onAddBackDesign(result);
           setSelectedConstellation('');
           setCustomBackText('');
-          setSelectedQuote('');
+          setSelectedQuote(quotes.love[0].text);
+          setSelectedCategory('love');
         } else {
           alert('뒷면 생성 실패: ' + (result.error || 'Unknown error'));
         }
