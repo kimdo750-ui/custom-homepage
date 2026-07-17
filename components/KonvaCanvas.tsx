@@ -215,7 +215,7 @@ export default function KonvaCanvas({
         ctx.stroke();
       }
     });
-  }, [elements, selectedId, images, clothColor, clothImg]);
+  }, [elements, selectedId, images, clothColor, clothImg, CANVAS_WIDTH, CANVAS_HEIGHT]);
 
   // 마우스 이벤트
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
