@@ -47,31 +47,71 @@ export async function POST(request: NextRequest) {
     const canvas = createCanvas(600, 480);
     const ctx = canvas.getContext('2d');
 
-    // 배경을 투명하게 (투명한 배경)
-    ctx.clearRect(0, 0, 600, 480);
+    // 배경을 흰색으로 (Remove.bg API로 투명하게 처리)
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 600, 480);
 
     // 띠그림 로드 및 그리기
     const zodiacImage = await loadImage(zodiacImagePath);
-    ctx.drawImage(zodiacImage, 150, 100, 300, 300);
+    ctx.drawImage(zodiacImage, 120, 60, 360, 360);
 
     // 텍스트 설정
     ctx.fillStyle = '#1a1a1a';
     ctx.textAlign = 'center';
 
     // 출생년도 그리기
-    ctx.font = 'bold 40px "Noto Sans KR", Arial';
+    ctx.font = 'bold 50px "Noto Sans KR", Arial';
     ctx.fillText(`${birthYear}년생`, 300, 50);
 
     // 이름 그리기
-    ctx.font = 'bold 58px "Noto Sans KR", Arial';
-    ctx.fillText(name, 300, 450);
+    ctx.font = 'bold 80px "Noto Sans KR", Arial';
+    ctx.fillText(name, 300, 465);
 
-    // PNG로 변환 (투명한 배경)
+    // PNG로 변환
     const pngBuffer = canvas.toBuffer('image/png');
 
     console.log('PNG 생성 완료');
 
-    // 캔버스의 투명 배경으로 직접 반환 (Remove.bg 사용 안 함 - 텍스트 손상 방지)
+    // Remove.bg API로 배경 제거
+    if (REMOVEBG_API_KEY) {
+      try {
+        const formData = new FormData();
+        formData.append('image_file', new Blob([pngBuffer]), 'front.png');
+        formData.append('size', 'auto');
+        formData.append('type', 'product');
+
+        const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+          method: 'POST',
+          headers: {
+            'X-Api-Key': REMOVEBG_API_KEY,
+          },
+          body: formData,
+        });
+
+        if (response.ok) {
+          const bgRemovedBuffer = await response.arrayBuffer();
+          const base64 = Buffer.from(bgRemovedBuffer).toString('base64');
+          const imageUrl = `data:image/png;base64,${base64}`;
+
+          console.log('앞면 생성 완료 (배경 제거됨)');
+
+          return NextResponse.json({
+            imageUrl,
+            type: 'front',
+            name,
+            birthYear,
+            zodiac,
+            bgRemoved: true,
+          });
+        } else {
+          console.warn('Remove.bg API 실패');
+        }
+      } catch (bgError) {
+        console.warn('배경 제거 중 오류:', bgError);
+      }
+    }
+
+    // 배경 제거 실패 시 원본 반환
     const base64 = pngBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
 
@@ -83,6 +123,7 @@ export async function POST(request: NextRequest) {
       name,
       birthYear,
       zodiac,
+      bgRemoved: false,
     });
 
   } catch (error) {
