@@ -6,10 +6,10 @@ const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
 // 파일명 매핑
 const phraseFiles: Record<string, string> = {
-  '사랑은 모든것을 이긴다': 'love_001.png',
-  '사랑이 없는곳에 사랑을 심어라': 'love_002.png',
-  '사랑은 주는것이다': 'love_003.png',
-  '우정은 영혼과 영혼의 만남이다': 'friendship_001.png',
+  '사랑으로 모든 것을 이기다': 'love_001.png',
+  '자랑이 없는 곳에 자랑을 심어라': 'love_002.png',
+  '사랑으로 주는 것이다': 'love_003.png',
+  '우정은 여홍과 여홍의 만남이다': 'friendship_001.png',
 };
 
 export const maxDuration = 60;
@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
 
     // Remove.bg API로 배경 제거
     if (REMOVEBG_API_KEY) {
+      console.log('Remove.bg API로 배경 제거 시작:', filename);
       try {
         const bgFormData = new FormData();
         bgFormData.append('image_file', new Blob([imageBuffer], { type: 'image/png' }), filename);
@@ -56,12 +57,14 @@ export async function POST(request: NextRequest) {
           body: bgFormData,
         });
 
+        console.log('Remove.bg 응답 상태:', bgResponse.status);
+
         if (bgResponse.ok) {
           const bgRemovedBuffer = await bgResponse.arrayBuffer();
           const base64 = Buffer.from(bgRemovedBuffer).toString('base64');
           const imageUrl = `data:image/png;base64,${base64}`;
 
-          console.log('명언 이미지 배경 제거 완료');
+          console.log('명언 이미지 배경 제거 완료 ✅');
 
           return NextResponse.json({
             imageUrl,
@@ -69,10 +72,15 @@ export async function POST(request: NextRequest) {
             type: 'preset',
             bgRemoved: true,
           });
+        } else {
+          const errorText = await bgResponse.text();
+          console.warn('Remove.bg API 오류:', bgResponse.status, errorText);
         }
       } catch (bgError) {
         console.warn('배경 제거 실패, 원본 사용:', bgError);
       }
+    } else {
+      console.warn('REMOVEBG_API_KEY가 설정되지 않았습니다');
     }
 
     // 배경 제거 실패 또는 API 키 없으면 원본 사용
