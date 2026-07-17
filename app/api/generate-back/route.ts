@@ -26,26 +26,26 @@ export async function POST(request: NextRequest) {
 
     console.log('뒷면 생성:', { text });
 
-    // Canvas 생성 (600x480)
-    const canvas = createCanvas(600, 480);
+    // Canvas 생성 (1200x960 - 2배 크기)
+    const canvas = createCanvas(1200, 960);
     const ctx = canvas.getContext('2d');
 
     // 배경을 흰색으로 (Remove.bg API로 투명하게 처리)
     ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 600, 480);
+    ctx.fillRect(0, 0, 1200, 960);
 
-    // 상단 원형 장식
+    // 상단 원형 장식 (2배)
     ctx.strokeStyle = '#e74c3c';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 4;
     ctx.globalAlpha = 0.4;
     ctx.beginPath();
-    ctx.arc(300, 80, 40, 0, Math.PI * 2);
+    ctx.arc(600, 160, 80, 0, Math.PI * 2);
     ctx.stroke();
 
     ctx.globalAlpha = 0.3;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(300, 80, 32, 0, Math.PI * 2);
+    ctx.arc(600, 160, 64, 0, Math.PI * 2);
     ctx.stroke();
 
     // 텍스트 (직접입력도 같은 크기)
@@ -53,24 +53,24 @@ export async function POST(request: NextRequest) {
     ctx.fillStyle = '#e74c3c';
     ctx.textAlign = 'center';
 
-    // 텍스트 길이에 따라 폰트 크기 조정 (훨씬 큼)
-    let fontSize = 110;
+    // 텍스트 길이에 따라 폰트 크기 조정 (2배 크기)
+    let fontSize = 220;
     if (text.length > 12) {
-      fontSize = 85;
+      fontSize = 170;
     } else if (text.length > 8) {
-      fontSize = 100;
+      fontSize = 200;
     }
 
     ctx.font = `italic bold ${fontSize}px serif`;
-    ctx.fillText(text.substring(0, 20), 300, 275);
+    ctx.fillText(text.substring(0, 20), 600, 550);
 
-    // 하단 선 장식
+    // 하단 선 장식 (2배)
     ctx.strokeStyle = '#e74c3c';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 4;
     ctx.globalAlpha = 0.4;
     ctx.beginPath();
-    ctx.moveTo(100, 320);
-    ctx.lineTo(500, 320);
+    ctx.moveTo(200, 640);
+    ctx.lineTo(1000, 640);
     ctx.stroke();
 
     // PNG로 변환

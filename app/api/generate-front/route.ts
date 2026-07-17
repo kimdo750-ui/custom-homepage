@@ -43,29 +43,29 @@ export async function POST(request: NextRequest) {
       throw new Error(`띠그림 파일을 찾을 수 없습니다: ${zodiacName}.png`);
     }
 
-    // Canvas 생성 (600x480)
-    const canvas = createCanvas(600, 480);
+    // Canvas 생성 (1200x960 - 2배 크기)
+    const canvas = createCanvas(1200, 960);
     const ctx = canvas.getContext('2d');
 
     // 배경을 흰색으로 (Remove.bg API로 투명하게 처리)
     ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 600, 480);
+    ctx.fillRect(0, 0, 1200, 960);
 
-    // 띠그림 로드 및 그리기
+    // 띠그림 로드 및 그리기 (2배)
     const zodiacImage = await loadImage(zodiacImagePath);
-    ctx.drawImage(zodiacImage, 120, 60, 360, 360);
+    ctx.drawImage(zodiacImage, 240, 120, 720, 720);
 
     // 텍스트 설정
     ctx.fillStyle = '#1a1a1a';
     ctx.textAlign = 'center';
 
-    // 출생년도 그리기 (훨씬 큼)
-    ctx.font = 'bold 60px sans-serif';
-    ctx.fillText(`${birthYear}년생`, 300, 55);
-
-    // 이름 그리기 (매우 큼)
+    // 출생년도 그리기 (2배 크기)
     ctx.font = 'bold 120px sans-serif';
-    ctx.fillText(name, 300, 460);
+    ctx.fillText(`${birthYear}년생`, 600, 110);
+
+    // 이름 그리기 (2배 크기)
+    ctx.font = 'bold 240px sans-serif';
+    ctx.fillText(name, 600, 920);
 
     // PNG로 변환
     const pngBuffer = canvas.toBuffer('image/png');
