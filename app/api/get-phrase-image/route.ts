@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createCanvas } from 'canvas';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
-// 프리셋 명언 매핑
-const phraseTexts: Record<string, string> = {
-  '사랑은 모든것을 이긴다': '사랑은 모든것을 이긴다',
-  '사랑이 없는곳에 사랑을 심어라': '사랑이 없는곳에\n사랑을 심어라',
-  '사랑은 주는것이다': '사랑은 주는것이다',
-  '우정은 영혼과 영혼의 만남이다': '우정은 영혼과\n영혼의 만남이다',
+const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
+
+// 파일명 매핑
+const phraseFiles: Record<string, string> = {
+  '사랑은 모든것을 이긴다': 'love_001.png',
+  '사랑이 없는곳에 사랑을 심어라': 'love_002.png',
+  '사랑은 주는것이다': 'love_003.png',
+  '우정은 영혼과 영혼의 만남이다': 'friendship_001.png',
 };
+
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,83 +25,64 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 공백 제거 후 확인
-    const normalizedText = text.replace(/\s+/g, '');
-    let displayText = phraseTexts[text];
-
-    if (!displayText) {
-      const matchedKey = Object.keys(phraseTexts).find(
-        key => key.replace(/\s+/g, '') === normalizedText
-      );
-      if (matchedKey) {
-        displayText = phraseTexts[matchedKey];
-      }
-    }
-
-    if (!displayText) {
+    // 파일명 찾기
+    let filename = phraseFiles[text];
+    if (!filename) {
       return NextResponse.json(
-        { error: '프리셋 이미지를 찾을 수 없습니다', text },
+        { error: '선택한 명언 이미지를 찾을 수 없습니다', text },
         { status: 404 }
       );
     }
 
-    console.log('명언 이미지 생성:', text);
+    console.log('명언 이미지 로드:', { text, filename });
 
-    // Canvas에서 텍스트 그리기 (600x480)
-    const canvas = createCanvas(600, 480);
-    const ctx = canvas.getContext('2d');
+    // 파일 읽기
+    const filepath = join(process.cwd(), 'public', 'phrases', filename);
+    const imageBuffer = readFileSync(filepath);
 
-    // 투명 배경 (알파채널 유지)
-    ctx.clearRect(0, 0, 600, 480);
+    // Remove.bg API로 배경 제거
+    if (REMOVEBG_API_KEY) {
+      try {
+        const bgFormData = new FormData();
+        bgFormData.append('image_file', new Blob([imageBuffer], { type: 'image/png' }), filename);
+        bgFormData.append('size', 'auto');
+        bgFormData.append('type', 'product');
 
-    // 상단 원형 장식
-    ctx.strokeStyle = '#e74c3c';
-    ctx.lineWidth = 2;
-    ctx.globalAlpha = 0.4;
-    ctx.beginPath();
-    ctx.arc(300, 80, 40, 0, Math.PI * 2);
-    ctx.stroke();
+        const bgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
+          method: 'POST',
+          headers: {
+            'X-Api-Key': REMOVEBG_API_KEY,
+          },
+          body: bgFormData,
+        });
 
-    ctx.globalAlpha = 0.3;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(300, 80, 32, 0, Math.PI * 2);
-    ctx.stroke();
+        if (bgResponse.ok) {
+          const bgRemovedBuffer = await bgResponse.arrayBuffer();
+          const base64 = Buffer.from(bgRemovedBuffer).toString('base64');
+          const imageUrl = `data:image/png;base64,${base64}`;
 
-    // 텍스트
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = '#e74c3c';
-    ctx.textAlign = 'center';
-    ctx.font = 'italic bold 100px sans-serif';
+          console.log('명언 이미지 배경 제거 완료');
 
-    // 줄바꿈 처리
-    const lines = displayText.split('\n');
-    let startY = 200;
-    const lineHeight = 125;
-
-    for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], 300, startY + i * lineHeight);
+          return NextResponse.json({
+            imageUrl,
+            text,
+            type: 'preset',
+            bgRemoved: true,
+          });
+        }
+      } catch (bgError) {
+        console.warn('배경 제거 실패, 원본 사용:', bgError);
+      }
     }
 
-    // 하단 선 장식
-    ctx.strokeStyle = '#e74c3c';
-    ctx.lineWidth = 2;
-    ctx.globalAlpha = 0.4;
-    ctx.beginPath();
-    ctx.moveTo(100, 320);
-    ctx.lineTo(500, 320);
-    ctx.stroke();
-
-    // PNG로 변환 (투명한 배경)
-    const pngBuffer = canvas.toBuffer('image/png');
-    const base64 = pngBuffer.toString('base64');
+    // 배경 제거 실패 또는 API 키 없으면 원본 사용
+    const base64 = imageBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
 
-    console.log('명언 이미지 생성 완료 (투명 배경)');
+    console.log('명언 이미지 원본 사용 (배경 제거 미적용)');
 
     return NextResponse.json({
       imageUrl,
-      cached: false,
       text,
       type: 'preset',
       bgRemoved: false,
