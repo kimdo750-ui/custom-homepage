@@ -32,14 +32,17 @@ function calculateZodiac(year: number): string {
   return zodiacs[zodiacIndex] + '띠';
 }
 
-interface Quote {
-  text: string;
-  source: string;
-}
-
-interface QuoteCategory {
-  [key: string]: Quote[];
-}
+// 명언 리스트 (직접 정의)
+const quotes = {
+  love: [
+    { text: '사랑은 모든것을 이긴다', source: '' },
+    { text: '사랑이 없는곳에 사랑을 심어라', source: '' },
+    { text: '사랑은 주는것이다', source: '' },
+  ],
+  friendship: [
+    { text: '우정은 영혼과 영혼의 만남이다', source: '' },
+  ],
+};
 
 export default function DesignPanel({
   clothColor,
@@ -55,36 +58,9 @@ export default function DesignPanel({
   // 뒷면 입력
   const [selectedConstellation, setSelectedConstellation] = useState('');
   const [customBackText, setCustomBackText] = useState('');
-  const [selectedQuote, setSelectedQuote] = useState('');
+  const [selectedQuote, setSelectedQuote] = useState(quotes.love[0].text);
   const [selectedCategory, setSelectedCategory] = useState<string>('love');
   const [backMode, setBackMode] = useState<'quote' | 'constellation' | 'custom'>('quote');
-  const [quotes, setQuotes] = useState<QuoteCategory>({});
-  const [loadingQuotes, setLoadingQuotes] = useState(false);
-
-  // 명언 데이터 로드
-  useEffect(() => {
-    const loadQuotes = async () => {
-      setLoadingQuotes(true);
-      try {
-        const response = await fetch('/api/quotes');
-        const data = await response.json();
-        if (data.quotes) {
-          setQuotes(data.quotes);
-          // 기본값: love 카테고리의 첫 번째 명언
-          const loveQuotes = data.quotes.love || [];
-          if (loveQuotes.length > 0) {
-            setSelectedQuote(loveQuotes[0].text);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load quotes:', error);
-      } finally {
-        setLoadingQuotes(false);
-      }
-    };
-
-    loadQuotes();
-  }, []);
 
   // 출생년도 변경 시 띠 자동 계산
   const handleBirthYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,7 +76,7 @@ export default function DesignPanel({
   // 카테고리 변경 시 첫 번째 명언 자동 선택
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    const categoryQuotes = quotes[category] || [];
+    const categoryQuotes = quotes[category as keyof typeof quotes] || [];
     if (categoryQuotes.length > 0) {
       setSelectedQuote(categoryQuotes[0].text);
     }
@@ -301,8 +277,8 @@ export default function DesignPanel({
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium mb-2">카테고리</label>
-                <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                  {['love', 'friend', 'success', 'challenge', 'happy', 'memory'].map((cat) => (
+                <div className="grid grid-cols-2 gap-2">
+                  {['love', 'friendship'].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => handleCategoryChange(cat)}
@@ -313,40 +289,31 @@ export default function DesignPanel({
                       }`}
                     >
                       {cat === 'love' && '❤️ 사랑'}
-                      {cat === 'friend' && '🤝 우정'}
-                      {cat === 'success' && '🏆 성공'}
-                      {cat === 'challenge' && '🔥 도전'}
-                      {cat === 'happy' && '🌟 행복'}
-                      {cat === 'memory' && '👴 추억'}
+                      {cat === 'friendship' && '🤝 우정'}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {loadingQuotes ? (
-                <p className="text-center text-gray-400 text-sm">로딩중...</p>
-              ) : (
-                <div>
-                  <label className="block text-sm font-medium mb-2">명언 선택</label>
-                  <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
-                    {(quotes[selectedCategory] || []).map((quote) => (
-                      <button
-                        key={quote.text}
-                        onClick={() => setSelectedQuote(quote.text)}
-                        className={`p-2 rounded-lg text-xs text-left font-medium ${
-                          selectedQuote === quote.text
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-gray-100'
-                        }`}
-                        title={quote.text}
-                      >
-                        <div className="truncate">{quote.text}</div>
-                        {quote.source && <div className="text-xs opacity-60">- {quote.source}</div>}
-                      </button>
-                    ))}
-                  </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">명언 선택</label>
+                <div className="grid grid-cols-1 gap-2">
+                  {(quotes[selectedCategory as keyof typeof quotes] || []).map((quote) => (
+                    <button
+                      key={quote.text}
+                      onClick={() => setSelectedQuote(quote.text)}
+                      className={`p-2 rounded-lg text-xs text-left font-medium ${
+                        selectedQuote === quote.text
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100'
+                      }`}
+                      title={quote.text}
+                    >
+                      <div className="truncate">{quote.text}</div>
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
