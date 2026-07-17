@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import KonvaCanvas from './KonvaCanvas';
 import DesignPanel from './DesignPanel';
 
@@ -19,6 +19,12 @@ interface DesignElement {
 export default function ClothDesigner() {
   const [elements, setElements] = useState<DesignElement[]>([]);
   const [clothColor, setClothColor] = useState('white');
+  const [showOrderForm, setShowOrderForm] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [isOrderLoading, setIsOrderLoading] = useState(false);
+  const frontCanvasRef = useRef<HTMLCanvasElement>(null);
+  const backCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const frontImageMap: Record<string, string> = {
     'white': '/front-images/white_front.png',
@@ -79,6 +85,63 @@ export default function ClothDesigner() {
     setElements(elements.filter((el) => el.id !== id));
   };
 
+  const handleOrderSubmit = async () => {
+    if (!customerName.trim() || !customerEmail.trim()) {
+      alert('이름과 이메일을 입력해주세요');
+      return;
+    }
+
+    setIsOrderLoading(true);
+
+    try {
+      // 앞면 이미지 추출
+      const frontImages = frontElements.map((el) => el.src).join(',');
+      const backImages = backElements.map((el) => el.src).join(',');
+
+      console.log('주문 생성:', {
+        customerName,
+        customerEmail,
+        clothColor,
+      });
+
+      const response = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName,
+          customerEmail,
+          clothColor,
+          frontImageUrl: frontImages,
+          backImageUrl: backImages,
+          designImageUrl: frontImages || backImages,
+          notes: `색상: ${clothColor}, 앞면: ${frontElements.length}개, 뒷면: ${backElements.length}개`,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || '주문 저장 실패');
+      }
+
+      console.log('주문 완료:', result.orderId);
+
+      alert(`✅ 주문이 저장되었습니다!\n주문번호: ${result.orderId}`);
+
+      // 폼 초기화
+      setShowOrderForm(false);
+      setCustomerName('');
+      setCustomerEmail('');
+      // setElements([]); // 선택사항: 주문 후 초기화
+
+    } catch (error) {
+      console.error('주문 오류:', error);
+      alert(error instanceof Error ? error.message : '주문 저장 중 오류 발생');
+    } finally {
+      setIsOrderLoading(false);
+    }
+  };
+
   const frontElements = elements.filter((el) => el.position === 'front');
   const backElements = elements.filter((el) => el.position === 'back');
 
@@ -100,9 +163,61 @@ export default function ClothDesigner() {
               앞면: {frontElements.length}개<br/>
               뒷면: {backElements.length}개
             </p>
+
+            {/* 주문 버튼 */}
+            {!showOrderForm && (
+              <button
+                onClick={() => setShowOrderForm(true)}
+                className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg"
+              >
+                🛒 주문하기
+              </button>
+            )}
+
+            {/* 주문 폼 */}
+            {showOrderForm && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-bold mb-3">주문 정보</h4>
+
+                <input
+                  type="text"
+                  placeholder="이름"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="w-full p-2 mb-2 border border-gray-300 rounded-lg"
+                  maxLength={50}
+                />
+
+                <input
+                  type="email"
+                  placeholder="이메일"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  className="w-full p-2 mb-3 border border-gray-300 rounded-lg"
+                />
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleOrderSubmit}
+                    disabled={isOrderLoading}
+                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 rounded-lg"
+                  >
+                    {isOrderLoading ? '저장 중...' : '주문 확정'}
+                  </button>
+
+                  <button
+                    onClick={() => setShowOrderForm(false)}
+                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-bold py-2 rounded-lg"
+                  >
+                    취소
+                  </button>
+                </div>
+              </div>
+            )}
+
             <button
               onClick={() => setElements([])}
-              className="w-full mt-4 bg-gray-300 hover:bg-gray-400 text-gray-900 font-bold py-2 rounded-lg"
+              className="w-full mt-2 bg-gray-300 hover:bg-gray-400 text-gray-900 font-bold py-2 rounded-lg"
             >
               모두 초기화
             </button>
