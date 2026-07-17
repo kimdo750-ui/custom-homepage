@@ -2,15 +2,15 @@
   "functions": {
     "app/api/create-order/route.ts": {
       "maxDuration": 60,
-      "memory": 3008
+      "memory": 1024
     },
     "app/api/upload-image/route.ts": {
       "maxDuration": 60,
-      "memory": 3008
+      "memory": 1024
     },
     "app/api/get-phrase-image/route.ts": {
       "maxDuration": 60,
-      "memory": 3008
+      "memory": 1024
     }
   }
 }
