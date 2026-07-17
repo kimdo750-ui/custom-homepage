@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFileSync, readFileSync, unlinkSync, existsSync } from 'fs';
+import { writeFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import sharp from 'sharp';
+import { createCanvas } from 'canvas';
+
+const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
 export const config = {
   maxDuration: 60,
 };
 
 export async function POST(request: NextRequest) {
-  const tempFiles: string[] = [];
+  let tempImagePath = '';
 
   try {
     const body: any = await request.json();
-    console.log('Received body:', body);
-
     const { text } = body;
 
     if (!text) {
@@ -26,37 +26,90 @@ export async function POST(request: NextRequest) {
 
     console.log('뒷면 생성:', { text });
 
-    // SVG 생성 (흰색 배경)
-    const svgContent = `<svg width="600" height="480" xmlns="http://www.w3.org/2000/svg">
-  <rect width="600" height="480" fill="white"/>
+    // Canvas 생성 (600x480)
+    const canvas = createCanvas(600, 480);
+    const ctx = canvas.getContext('2d');
 
-  <circle cx="300" cy="80" r="40" fill="none" stroke="#e74c3c" stroke-width="2" opacity="0.4"/>
-  <circle cx="300" cy="80" r="32" fill="none" stroke="#e74c3c" stroke-width="1" opacity="0.3"/>
+    // 배경을 투명하게
+    ctx.clearRect(0, 0, 600, 480);
 
-  <text x="300" y="260" font-family="Noto Serif KR, serif" font-size="64" font-weight="700" text-anchor="middle" fill="#e74c3c" style="font-style: italic; letter-spacing: 3px;">${text.substring(0, 15)}</text>
+    // 상단 원형 장식
+    ctx.strokeStyle = '#e74c3c';
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath();
+    ctx.arc(300, 80, 40, 0, Math.PI * 2);
+    ctx.stroke();
 
-  <line x1="100" y1="320" x2="500" y2="320" stroke="#e74c3c" stroke-width="2" opacity="0.4"/>
-</svg>`;
+    ctx.globalAlpha = 0.3;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(300, 80, 32, 0, Math.PI * 2);
+    ctx.stroke();
 
-    const svgPath = join(tmpdir(), `back_${Date.now()}.svg`);
-    const pngPath = join(tmpdir(), `back_${Date.now()}.png`);
-    const outputPath = join(tmpdir(), `back_bg_removed_${Date.now()}.png`);
+    // 텍스트
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#e74c3c';
+    ctx.textAlign = 'center';
+    ctx.font = 'italic bold 64px "Noto Serif KR", Georgia';
+    ctx.letterSpacing = '3px';
+    ctx.fillText(text.substring(0, 15), 300, 260);
 
-    tempFiles.push(svgPath, pngPath, outputPath);
+    // 하단 선 장식
+    ctx.strokeStyle = '#e74c3c';
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath();
+    ctx.moveTo(100, 320);
+    ctx.lineTo(500, 320);
+    ctx.stroke();
 
-    writeFileSync(svgPath, svgContent);
-    console.log('뒷면 SVG 생성 완료');
+    // PNG로 변환
+    const pngBuffer = canvas.toBuffer('image/png');
+    tempImagePath = join(tmpdir(), `back_${Date.now()}.png`);
+    writeFileSync(tempImagePath, pngBuffer);
 
-    // SVG → PNG 변환
-    await sharp(svgPath, { density: 150 })
-      .png()
-      .toFile(pngPath);
+    console.log('PNG 생성 완료');
 
-    console.log('PNG 변환 완료');
+    // Remove.bg API로 배경 제거
+    if (REMOVEBG_API_KEY) {
+      try {
+        const formData = new FormData();
+        formData.append('image_file', new Blob([pngBuffer]), 'back.png');
+        formData.append('size', 'auto');
+        formData.append('type', 'auto');
 
-    // 결과 이미지 읽기 (배경 제거 없음)
-    const resultBuffer = readFileSync(pngPath);
-    const base64 = resultBuffer.toString('base64');
+        const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+          method: 'POST',
+          headers: {
+            'X-Api-Key': REMOVEBG_API_KEY,
+          },
+          body: formData,
+        });
+
+        if (response.ok) {
+          const bgRemovedBuffer = await response.arrayBuffer();
+          const base64 = Buffer.from(bgRemovedBuffer).toString('base64');
+          const imageUrl = `data:image/png;base64,${base64}`;
+
+          console.log('뒷면 생성 완료 (배경 제거됨)');
+
+          return NextResponse.json({
+            imageUrl,
+            type: 'back',
+            text,
+            bgRemoved: true,
+          });
+        } else {
+          console.warn('Remove.bg API 실패, 원본 이미지 반환');
+        }
+      } catch (bgError) {
+        console.warn('배경 제거 중 오류:', bgError);
+      }
+    }
+
+    // 배경 제거 없이 반환
+    const base64 = pngBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
 
     console.log('뒷면 생성 완료');
@@ -65,6 +118,7 @@ export async function POST(request: NextRequest) {
       imageUrl,
       type: 'back',
       text,
+      bgRemoved: false,
     });
 
   } catch (error) {
@@ -77,12 +131,10 @@ export async function POST(request: NextRequest) {
     );
   } finally {
     // 임시 파일 정리
-    tempFiles.forEach((file) => {
-      try {
-        if (existsSync(file)) unlinkSync(file);
-      } catch (e) {
-        console.warn('파일 정리 실패:', file);
-      }
-    });
+    try {
+      if (tempImagePath) unlinkSync(tempImagePath);
+    } catch (e) {
+      console.warn('파일 정리 실패:', tempImagePath);
+    }
   }
 }

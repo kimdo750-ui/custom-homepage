@@ -1,30 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFileSync, readFileSync, unlinkSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import sharp from 'sharp';
+import { createCanvas, loadImage } from 'canvas';
+
+const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
 export const config = {
   maxDuration: 60,
 };
 
 export async function POST(request: NextRequest) {
-  const tempFiles: string[] = [];
+  let tempImagePath = '';
 
   try {
     const bodyText = await request.text();
-    console.log('Raw body text:', bodyText);
-
     let body: any = {};
     if (bodyText) {
       try {
         body = JSON.parse(bodyText);
-        console.log('JSON parse success, body keys:', Object.keys(body));
       } catch (parseError) {
-        console.error('JSON parse error:', parseError, 'bodyText length:', bodyText.length);
+        console.error('JSON parse error:', parseError);
       }
     }
-    console.log('Parsed body:', body);
 
     const { name, birthYear, zodiac } = body;
 
@@ -39,46 +37,83 @@ export async function POST(request: NextRequest) {
 
     // 띠그림 로드
     const zodiacName = zodiac?.replace(/띠$/, '') || '';
-    console.log('Zodiac name after replace:', zodiacName);
     const zodiacImagePath = join(process.cwd(), 'public', 'zodiac', `${zodiacName}.png`);
-    console.log('Zodiac image path:', zodiacImagePath, 'exists:', existsSync(zodiacImagePath));
 
     if (!existsSync(zodiacImagePath)) {
       throw new Error(`띠그림 파일을 찾을 수 없습니다: ${zodiacName}.png`);
     }
 
-    // 띠그림 로드
-    const zodiacImageBuffer = readFileSync(zodiacImagePath);
-    const zodiacBase64 = zodiacImageBuffer.toString('base64');
-    console.log('띠그림 로드 완료');
+    // Canvas 생성 (600x480)
+    const canvas = createCanvas(600, 480);
+    const ctx = canvas.getContext('2d');
 
-    // SVG 생성 (띠그림 포함, 흰색 배경, 글자는 검정색 고정)
-    const svgContent = `<svg width="600" height="480" xmlns="http://www.w3.org/2000/svg">
-  <rect width="600" height="480" fill="white"/>
-  <text x="300" y="50" font-family="Noto Sans KR, sans-serif" font-size="40" font-weight="700" text-anchor="middle" fill="#1a1a1a">${birthYear}년생</text>
-  <image x="150" y="100" width="300" height="300" href="data:image/png;base64,${zodiacBase64}"/>
-  <text x="300" y="450" font-family="Noto Sans KR, sans-serif" font-size="58" font-weight="700" text-anchor="middle" fill="#1a1a1a">${name}</text>
-</svg>`;
+    // 배경을 투명하게 (투명한 배경)
+    ctx.clearRect(0, 0, 600, 480);
 
-    const svgPath = join(tmpdir(), `front_${Date.now()}.svg`);
-    const pngPath = join(tmpdir(), `front_png_${Date.now()}.png`);
-    const outputPath = join(tmpdir(), `front_bg_removed_${Date.now()}.png`);
+    // 띠그림 로드 및 그리기
+    const zodiacImage = await loadImage(zodiacImagePath);
+    ctx.drawImage(zodiacImage, 150, 100, 300, 300);
 
-    tempFiles.push(svgPath, pngPath, outputPath);
+    // 텍스트 설정
+    ctx.fillStyle = '#1a1a1a';
+    ctx.textAlign = 'center';
 
-    writeFileSync(svgPath, svgContent);
-    console.log('SVG 생성 완료');
+    // 출생년도 그리기
+    ctx.font = 'bold 40px "Noto Sans KR", Arial';
+    ctx.fillText(`${birthYear}년생`, 300, 50);
 
-    // SVG → PNG 변환
-    await sharp(svgPath, { density: 150 })
-      .png()
-      .toFile(pngPath);
+    // 이름 그리기
+    ctx.font = 'bold 58px "Noto Sans KR", Arial';
+    ctx.fillText(name, 300, 450);
 
-    console.log('PNG 변환 완료');
+    // PNG로 변환
+    const pngBuffer = canvas.toBuffer('image/png');
+    tempImagePath = join(tmpdir(), `front_${Date.now()}.png`);
+    writeFileSync(tempImagePath, pngBuffer);
 
-    // 결과 반환 (배경 제거 없음)
-    const resultBuffer = readFileSync(pngPath);
-    const base64 = resultBuffer.toString('base64');
+    console.log('PNG 생성 완료');
+
+    // Remove.bg API로 배경 제거
+    if (REMOVEBG_API_KEY) {
+      try {
+        const formData = new FormData();
+        formData.append('image_file', new Blob([pngBuffer]), 'front.png');
+        formData.append('size', 'auto');
+        formData.append('type', 'auto');
+
+        const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+          method: 'POST',
+          headers: {
+            'X-Api-Key': REMOVEBG_API_KEY,
+          },
+          body: formData,
+        });
+
+        if (response.ok) {
+          const bgRemovedBuffer = await response.arrayBuffer();
+          const base64 = Buffer.from(bgRemovedBuffer).toString('base64');
+          const imageUrl = `data:image/png;base64,${base64}`;
+
+          console.log('앞면 생성 완료 (배경 제거됨)');
+
+          return NextResponse.json({
+            imageUrl,
+            type: 'front',
+            name,
+            birthYear,
+            zodiac,
+            bgRemoved: true,
+          });
+        } else {
+          console.warn('Remove.bg API 실패, 원본 이미지 반환');
+        }
+      } catch (bgError) {
+        console.warn('배경 제거 중 오류:', bgError);
+      }
+    }
+
+    // 배경 제거 없이 반환
+    const base64 = pngBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
 
     console.log('앞면 생성 완료');
@@ -89,6 +124,7 @@ export async function POST(request: NextRequest) {
       name,
       birthYear,
       zodiac,
+      bgRemoved: false,
     });
 
   } catch (error) {
@@ -101,12 +137,10 @@ export async function POST(request: NextRequest) {
     );
   } finally {
     // 임시 파일 정리
-    tempFiles.forEach((file) => {
-      try {
-        if (existsSync(file)) unlinkSync(file);
-      } catch (e) {
-        console.warn('파일 정리 실패:', file);
-      }
-    });
+    try {
+      if (tempImagePath && existsSync(tempImagePath)) unlinkSync(tempImagePath);
+    } catch (e) {
+      console.warn('파일 정리 실패:', tempImagePath);
+    }
   }
 }
