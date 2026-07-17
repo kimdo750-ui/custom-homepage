@@ -56,13 +56,17 @@ export async function POST(request: NextRequest) {
 
     const resultBuffer = readFileSync(imageAbsPath);
 
-    // Remove.bg API로 배경 제거
+    // Remove.bg API로 배경 제거 (타임아웃 설정)
     if (REMOVEBG_API_KEY) {
       try {
         const formData = new FormData();
         formData.append('image_file', new Blob([resultBuffer]), 'phrase.png');
         formData.append('size', 'auto');
-        formData.append('type', 'product');
+        formData.append('type', 'auto');
+        formData.append('format', 'auto');
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
 
         const response = await fetch('https://api.remove.bg/v1.0/removebg', {
           method: 'POST',
@@ -70,12 +74,17 @@ export async function POST(request: NextRequest) {
             'X-Api-Key': REMOVEBG_API_KEY,
           },
           body: formData,
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           const bgRemovedBuffer = await response.arrayBuffer();
           const base64 = Buffer.from(bgRemovedBuffer).toString('base64');
           const imageUrl = `data:image/png;base64,${base64}`;
+
+          console.log('명언 이미지 배경 제거 완료');
 
           return NextResponse.json({
             imageUrl,
@@ -85,7 +94,7 @@ export async function POST(request: NextRequest) {
             bgRemoved: true,
           });
         } else {
-          console.warn('Remove.bg API 실패, 원본 이미지 반환');
+          console.warn('Remove.bg API 실패 (상태:', response.status, '), 원본 반환');
         }
       } catch (bgError) {
         console.warn('배경 제거 중 오류:', bgError);

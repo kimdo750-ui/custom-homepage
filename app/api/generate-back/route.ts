@@ -53,16 +53,17 @@ export async function POST(request: NextRequest) {
     ctx.fillStyle = '#e74c3c';
     ctx.textAlign = 'center';
 
-    // 텍스트 길이에 따라 폰트 크기 조정 (2배 크기)
-    let fontSize = 220;
+    // 텍스트 길이에 따라 폰트 크기 조정 (더 큼)
+    let fontSize = 260;
     if (text.length > 12) {
-      fontSize = 170;
-    } else if (text.length > 8) {
       fontSize = 200;
+    } else if (text.length > 8) {
+      fontSize = 230;
     }
 
-    ctx.font = `italic bold ${fontSize}px serif`;
-    ctx.fillText(text.substring(0, 20), 600, 550);
+    // sans-serif 사용 (한글 호환성 개선)
+    ctx.font = `italic bold ${fontSize}px sans-serif`;
+    ctx.fillText(text.substring(0, 20), 600, 570);
 
     // 하단 선 장식 (2배)
     ctx.strokeStyle = '#e74c3c';
