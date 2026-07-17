@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import KonvaCanvas from './KonvaCanvas';
 import ImageDesignPanel from './ImageDesignPanel';
 
@@ -16,7 +16,7 @@ interface DesignElement {
   src: string;
 }
 
-export default function ImageDesigner() {
+export default function ImageClothDesigner() {
   const [elements, setElements] = useState<DesignElement[]>([]);
   const [clothColor, setClothColor] = useState('white');
   const [showOrderForm, setShowOrderForm] = useState(false);
@@ -40,7 +40,7 @@ export default function ImageDesigner() {
     'sky': '/back-images/sky_back.png',
   };
 
-  const frontImageUrl = frontImageMap[clothColor] || frontImageMap['white'];
+  const clothImageUrl = frontImageMap[clothColor] || frontImageMap['white'];
   const backImageUrl = backImageMap[clothColor] || backImageMap['white'];
 
   const handleAddFrontImage = (result: any) => {
@@ -48,10 +48,10 @@ export default function ImageDesigner() {
       id: Date.now().toString(),
       type: 'image',
       position: 'front',
-      x: 150,
-      y: 200,
-      width: 200,
-      height: 150,
+      x: 100,
+      y: 150,
+      width: 400,
+      height: 300,
       rotation: 0,
       src: result.imageUrl,
     };
@@ -63,10 +63,10 @@ export default function ImageDesigner() {
       id: Date.now().toString(),
       type: 'image',
       position: 'back',
-      x: 150,
-      y: 200,
-      width: 200,
-      height: 150,
+      x: 100,
+      y: 150,
+      width: 400,
+      height: 300,
       rotation: 0,
       src: result.imageUrl,
     };
@@ -228,13 +228,13 @@ export default function ImageDesigner() {
           <KonvaCanvas
             elements={frontElements}
             clothColor={clothColor}
-            clothImageUrl={frontImageUrl}
+            clothImageUrl={clothImageUrl}
             onUpdateElement={handleUpdateElement}
             onDeleteElement={handleDeleteElement}
           />
           {frontElements.length === 0 && (
             <p className="text-center text-gray-400 text-sm mt-3">
-              앞면 디자인 {frontElements.length}개
+              앞면 이미지 {frontElements.length}개
             </p>
           )}
         </div>
@@ -253,7 +253,7 @@ export default function ImageDesigner() {
           />
           {backElements.length === 0 && (
             <p className="text-center text-gray-400 text-sm mt-3">
-              뒷면 디자인 {backElements.length}개
+              뒷면 이미지 {backElements.length}개
             </p>
           )}
         </div>
