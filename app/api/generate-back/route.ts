@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { execFile } from 'child_process';
 import { writeFileSync, readFileSync, unlinkSync, existsSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { promisify } from 'util';
 import sharp from 'sharp';
-
-const execFileAsync = promisify(execFile);
 
 export const config = {
   maxDuration: 60,

@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { execFile } from 'child_process';
 import { writeFileSync, readFileSync, unlinkSync, existsSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { promisify } from 'util';
 import sharp from 'sharp';
-
-const execFileAsync = promisify(execFile);
 
 export const config = {
   maxDuration: 60,
@@ -51,13 +47,7 @@ export async function POST(request: NextRequest) {
       throw new Error(`띠그림 파일을 찾을 수 없습니다: ${zodiacName}.png`);
     }
 
-    // 띠그림 배경 제거 (한글 경로 문제 해결)
-    const pythonScript = join(process.cwd(), 'scripts', 'remove_bg.py');
-    const zodiacTempInputPath = join(tmpdir(), `zodiac_input_${Date.now()}.png`);
-    const zodiacTempOutputPath = join(tmpdir(), `zodiac_output_${Date.now()}.png`);
-    tempFiles.push(zodiacTempInputPath, zodiacTempOutputPath);
-
-    // 띠그림 로드 (배경 제거 없음)
+    // 띠그림 로드
     const zodiacImageBuffer = readFileSync(zodiacImagePath);
     const zodiacBase64 = zodiacImageBuffer.toString('base64');
     console.log('띠그림 로드 완료');

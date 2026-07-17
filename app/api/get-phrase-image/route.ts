@@ -1,25 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { execFile } from 'child_process';
-import { readFileSync, unlinkSync, existsSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { tmpdir } from 'os';
-import { promisify } from 'util';
-
-const execFileAsync = promisify(execFile);
 
 // 프리셋 명언 매핑
 const phraseImages: Record<string, string> = {
   '사랑은 모든것을 이긴다': '/phrases/love_001.png',
   '사랑이 없는곳에 사랑을 심어라': '/phrases/love_002.png',
   '사랑은 주는것이다': '/phrases/love_003.png',
-  '성공은 준비와 기회의 만남이다': '/phrases/success_001.png',
   '우정은 영혼과 영혼의 만남이다': '/phrases/friendship_001.png',
-  '하면 된다': '/phrases/challenge_001.png',
 };
 
 export async function POST(request: NextRequest) {
-  const tempFiles: string[] = [];
-
   try {
     const { text } = await request.json();
 
@@ -61,8 +52,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 배경 제거
-    // 결과 읽기 (배경 제거 없음)
     const resultBuffer = readFileSync(imageAbsPath);
     const base64 = resultBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64}`;
@@ -85,13 +74,5 @@ export async function POST(request: NextRequest) {
       },
       { status: 500 }
     );
-  } finally {
-    tempFiles.forEach((file) => {
-      try {
-        if (existsSync(file)) unlinkSync(file);
-      } catch (e) {
-        console.warn('파일 정리 실패:', file);
-      }
-    });
   }
 }
