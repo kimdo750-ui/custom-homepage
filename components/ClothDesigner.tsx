@@ -95,10 +95,6 @@ export default function ClothDesigner() {
     setIsOrderLoading(true);
 
     try {
-      // 앞면 이미지 추출
-      const frontImages = frontElements.map((el) => el.src).join(',');
-      const backImages = backElements.map((el) => el.src).join(',');
-
       console.log('주문 생성:', {
         customerName,
         customerEmail,
@@ -112,9 +108,9 @@ export default function ClothDesigner() {
           customerName,
           customerEmail,
           clothColor,
-          frontImageUrl: frontImages,
-          backImageUrl: backImages,
-          designImageUrl: frontImages || backImages,
+          frontImageUrl: '',
+          backImageUrl: '',
+          designImageUrl: '',
           notes: `색상: ${clothColor}, 앞면: ${frontElements.length}개, 뒷면: ${backElements.length}개`,
         }),
       });
