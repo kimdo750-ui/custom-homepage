@@ -42,49 +42,49 @@ export async function POST(request: NextRequest) {
 
     console.log('명언 이미지 생성:', text);
 
-    // Canvas에서 투명 배경으로 텍스트 그리기 (1200x960)
-    const canvas = createCanvas(1200, 960);
+    // Canvas에서 투명 배경으로 텍스트 그리기 (600x480)
+    const canvas = createCanvas(600, 480);
     const ctx = canvas.getContext('2d');
 
     // 배경을 투명하게 유지
-    ctx.clearRect(0, 0, 1200, 960);
+    ctx.clearRect(0, 0, 600, 480);
 
     // 상단 원형 장식
     ctx.strokeStyle = '#e74c3c';
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 2;
     ctx.globalAlpha = 0.4;
     ctx.beginPath();
-    ctx.arc(600, 160, 80, 0, Math.PI * 2);
+    ctx.arc(300, 80, 40, 0, Math.PI * 2);
     ctx.stroke();
 
     ctx.globalAlpha = 0.3;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(600, 160, 64, 0, Math.PI * 2);
+    ctx.arc(300, 80, 32, 0, Math.PI * 2);
     ctx.stroke();
 
     // 텍스트
     ctx.globalAlpha = 1;
     ctx.fillStyle = '#e74c3c';
     ctx.textAlign = 'center';
-    ctx.font = 'italic bold 200px sans-serif';
+    ctx.font = 'italic bold 100px sans-serif';
 
     // 줄바꿈 처리
     const lines = displayText.split('\n');
-    let startY = 400;
-    const lineHeight = 250;
+    let startY = 200;
+    const lineHeight = 125;
 
     for (let i = 0; i < lines.length; i++) {
-      ctx.fillText(lines[i], 600, startY + i * lineHeight);
+      ctx.fillText(lines[i], 300, startY + i * lineHeight);
     }
 
     // 하단 선 장식
     ctx.strokeStyle = '#e74c3c';
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 2;
     ctx.globalAlpha = 0.4;
     ctx.beginPath();
-    ctx.moveTo(200, 820);
-    ctx.lineTo(1000, 820);
+    ctx.moveTo(100, 320);
+    ctx.lineTo(500, 320);
     ctx.stroke();
 
     // PNG로 변환 (투명한 배경)
