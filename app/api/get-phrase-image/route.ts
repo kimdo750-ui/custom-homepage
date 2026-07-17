@@ -42,12 +42,13 @@ export async function POST(request: NextRequest) {
 
     console.log('명언 이미지 생성:', text);
 
-    // Canvas에서 투명 배경으로 텍스트 그리기 (600x480)
+    // Canvas에서 텍스트 그리기 (600x480)
     const canvas = createCanvas(600, 480);
     const ctx = canvas.getContext('2d');
 
-    // 배경을 투명하게 유지
-    ctx.clearRect(0, 0, 600, 480);
+    // 배경을 흰색으로 (테스트용)
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 600, 480);
 
     // 상단 원형 장식
     ctx.strokeStyle = '#e74c3c';
