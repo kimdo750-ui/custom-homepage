@@ -164,10 +164,10 @@ export default function DesignPanel({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* 옷 색상 */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">옷 색상</h2>
+      <div className="card">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">옷 색상</h3>
         <div className="space-y-2">
           {[
             { name: '흰색', value: 'white' },
@@ -181,7 +181,7 @@ export default function DesignPanel({
               onClick={() => onClothColorChange(color.value)}
               className={`w-full p-3 rounded-lg font-medium transition ${
                 clothColor === color.value
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-primary-600 text-white shadow-sm'
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
               }`}
             >
@@ -192,44 +192,44 @@ export default function DesignPanel({
       </div>
 
       {/* 앞면 */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">👤 앞면</h2>
+      <div className="card">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">👤 앞면</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">이름</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">이름</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="예: 김동일"
-              className="w-full p-3 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 text-sm"
               maxLength={10}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">출생년도</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">출생년도</label>
             <input
               type="number"
               value={birthYear}
               onChange={handleBirthYearChange}
               placeholder="예: 1990"
-              className="w-full p-3 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 text-sm"
               min={1900}
               max={2024}
             />
           </div>
 
           {zodiac && (
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-gray-600">🐯 띠:</p>
-              <p className="text-lg font-bold text-blue-600">{zodiac}</p>
+            <div className="p-3 bg-primary-50 rounded-lg border border-primary-200">
+              <p className="text-xs font-medium text-primary-700">🐯 띠:</p>
+              <p className="text-base font-bold text-primary-600">{zodiac}</p>
             </div>
           )}
 
           <button
             onClick={handleAddFrontDesign}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg"
+            className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2.5 rounded-lg shadow-sm"
           >
             앞면 추가
           </button>
@@ -237,37 +237,37 @@ export default function DesignPanel({
       </div>
 
       {/* 뒷면 */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">⭐ 뒷면</h2>
+      <div className="card">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">⭐ 뒷면</h3>
 
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={() => setBackMode('quote')}
-              className={`p-2 rounded-lg font-medium text-sm ${
+              className={`p-2 rounded-lg font-medium text-sm transition ${
                 backMode === 'quote'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100'
+                  ? 'bg-secondary-600 text-white shadow-sm'
+                  : 'bg-gray-100 hover:bg-gray-200'
               }`}
             >
               💭 명언
             </button>
             <button
               onClick={() => setBackMode('constellation')}
-              className={`p-2 rounded-lg font-medium text-sm ${
+              className={`p-2 rounded-lg font-medium text-sm transition ${
                 backMode === 'constellation'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100'
+                  ? 'bg-secondary-600 text-white shadow-sm'
+                  : 'bg-gray-100 hover:bg-gray-200'
               }`}
             >
               ✨ 별자리
             </button>
             <button
               onClick={() => setBackMode('custom')}
-              className={`p-2 rounded-lg font-medium text-sm ${
+              className={`p-2 rounded-lg font-medium text-sm transition ${
                 backMode === 'custom'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100'
+                  ? 'bg-secondary-600 text-white shadow-sm'
+                  : 'bg-gray-100 hover:bg-gray-200'
               }`}
             >
               ✏️ 직접입력
@@ -277,16 +277,16 @@ export default function DesignPanel({
           {backMode === 'quote' && (
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium mb-2">카테고리</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
                 <div className="grid grid-cols-2 gap-2">
                   {['love', 'friendship'].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => handleCategoryChange(cat)}
-                      className={`p-2 rounded-lg text-xs font-medium ${
+                      className={`p-2 rounded-lg text-xs font-medium transition ${
                         selectedCategory === cat
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-100'
+                          ? 'bg-secondary-600 text-white shadow-sm'
+                          : 'bg-gray-100 hover:bg-gray-200'
                       }`}
                     >
                       {cat === 'love' && '❤️ 사랑'}
@@ -297,16 +297,16 @@ export default function DesignPanel({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">명언 선택</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">명언 선택</label>
                 <div className="grid grid-cols-1 gap-2">
                   {(quotes[selectedCategory as keyof typeof quotes] || []).map((quote) => (
                     <button
                       key={quote.text}
                       onClick={() => setSelectedQuote(quote.text)}
-                      className={`p-2 rounded-lg text-xs text-left font-medium ${
+                      className={`p-2 rounded-lg text-xs text-left font-medium transition ${
                         selectedQuote === quote.text
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-100'
+                          ? 'bg-secondary-600 text-white shadow-sm'
+                          : 'bg-gray-100 hover:bg-gray-200'
                       }`}
                       title={quote.text}
                     >
@@ -320,16 +320,16 @@ export default function DesignPanel({
 
           {backMode === 'constellation' && (
             <div>
-              <label className="block text-sm font-medium mb-2">별자리 선택</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">별자리 선택</label>
               <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
                 {CONSTELLATIONS.map((const_item) => (
                   <button
                     key={const_item.name}
                     onClick={() => setSelectedConstellation(const_item.name)}
-                    className={`p-2 rounded-lg text-sm font-medium ${
+                    className={`p-2 rounded-lg text-xs font-medium transition ${
                       selectedConstellation === const_item.name
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100'
+                        ? 'bg-secondary-600 text-white shadow-sm'
+                        : 'bg-gray-100 hover:bg-gray-200'
                     }`}
                   >
                     {const_item.symbol} {const_item.name}
@@ -341,12 +341,12 @@ export default function DesignPanel({
 
           {backMode === 'custom' && (
             <div>
-              <label className="block text-sm font-medium mb-2">문구 입력</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">문구 입력</label>
               <textarea
                 value={customBackText}
                 onChange={(e) => setCustomBackText(e.target.value)}
                 placeholder="원하는 문구를 입력하세요..."
-                className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                className="w-full px-3 py-2 text-sm resize-none"
                 rows={3}
                 maxLength={15}
               />
@@ -355,7 +355,7 @@ export default function DesignPanel({
 
           <button
             onClick={handleAddBackDesign}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg"
+            className="w-full bg-secondary-600 hover:bg-secondary-700 text-white font-semibold py-2.5 rounded-lg shadow-sm"
           >
             뒷면 추가
           </button>

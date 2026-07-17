@@ -155,9 +155,9 @@ export default function ClothDesigner() {
         />
 
         {elements.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mt-6">
-            <h3 className="text-lg font-bold mb-2">현재 디자인</h3>
-            <p className="text-sm text-gray-600">
+          <div className="card mt-6">
+            <h3 className="text-lg font-semibold mb-3 text-gray-900">현재 디자인</h3>
+            <p className="text-sm text-gray-600 mb-4">
               앞면: {frontElements.length}개<br/>
               뒷면: {backElements.length}개
             </p>
@@ -166,7 +166,7 @@ export default function ClothDesigner() {
             {!showOrderForm && (
               <button
                 onClick={() => setShowOrderForm(true)}
-                className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg"
+                className="w-full bg-success-600 hover:bg-success-700 text-white font-semibold py-2.5 rounded-lg shadow-sm"
               >
                 🛒 주문하기
               </button>
@@ -174,15 +174,15 @@ export default function ClothDesigner() {
 
             {/* 주문 폼 */}
             {showOrderForm && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-bold mb-3">주문 정보</h4>
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 className="font-semibold text-gray-900 mb-3">주문 정보</h4>
 
                 <input
                   type="text"
                   placeholder="이름"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full p-2 mb-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 mb-3 text-sm"
                   maxLength={50}
                 />
 
@@ -191,21 +191,21 @@ export default function ClothDesigner() {
                   placeholder="이메일"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
-                  className="w-full p-2 mb-3 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 mb-4 text-sm"
                 />
 
                 <div className="flex gap-2">
                   <button
                     onClick={handleOrderSubmit}
                     disabled={isOrderLoading}
-                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 rounded-lg"
+                    className="flex-1 bg-success-600 hover:bg-success-700 disabled:bg-gray-400 text-white font-semibold py-2 rounded-lg shadow-sm"
                   >
                     {isOrderLoading ? '저장 중...' : '주문 확정'}
                   </button>
 
                   <button
                     onClick={() => setShowOrderForm(false)}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-bold py-2 rounded-lg"
+                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-2 rounded-lg"
                   >
                     취소
                   </button>
@@ -215,7 +215,7 @@ export default function ClothDesigner() {
 
             <button
               onClick={() => setElements([])}
-              className="w-full mt-2 bg-gray-300 hover:bg-gray-400 text-gray-900 font-bold py-2 rounded-lg"
+              className="w-full mt-3 bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 rounded-lg"
             >
               모두 초기화
             </button>
