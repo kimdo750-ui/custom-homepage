@@ -158,17 +158,6 @@ export default function ClothDesigner() {
           onAddBackDesign={handleAddBackDesign}
         />
 
-        {/* 이미지 디자인 */}
-        <div className="mt-6">
-          <h3 className="text-lg font-bold mb-4 px-6">또는 이미지로 디자인</h3>
-          <ImageDesignPanel
-            clothColor={clothColor}
-            onClothColorChange={() => {}}
-            onAddFrontImage={handleAddFrontDesign}
-            onAddBackImage={handleAddBackDesign}
-          />
-        </div>
-
         {elements.length > 0 && (
           <div className="bg-white rounded-lg shadow p-6 mt-6">
             <h3 className="text-lg font-bold mb-2">현재 디자인</h3>
