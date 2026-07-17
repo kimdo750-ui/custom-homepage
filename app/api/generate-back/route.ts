@@ -48,12 +48,21 @@ export async function POST(request: NextRequest) {
     ctx.arc(300, 80, 32, 0, Math.PI * 2);
     ctx.stroke();
 
-    // 텍스트
+    // 텍스트 (직접입력도 같은 크기)
     ctx.globalAlpha = 1;
     ctx.fillStyle = '#e74c3c';
     ctx.textAlign = 'center';
-    ctx.font = 'italic bold 72px "Noto Serif KR", Georgia';
-    ctx.fillText(text.substring(0, 15), 300, 260);
+
+    // 텍스트 길이에 따라 폰트 크기 조정
+    let fontSize = 90;
+    if (text.length > 12) {
+      fontSize = 70;
+    } else if (text.length > 8) {
+      fontSize = 80;
+    }
+
+    ctx.font = `italic bold ${fontSize}px "Noto Serif KR", Georgia`;
+    ctx.fillText(text.substring(0, 20), 300, 270);
 
     // 하단 선 장식
     ctx.strokeStyle = '#e74c3c';

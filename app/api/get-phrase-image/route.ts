@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         const formData = new FormData();
         formData.append('image_file', new Blob([resultBuffer]), 'phrase.png');
         formData.append('size', 'auto');
-        formData.append('type', 'auto');
+        formData.append('type', 'product');
 
         const response = await fetch('https://api.remove.bg/v1.0/removebg', {
           method: 'POST',
