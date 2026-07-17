@@ -2,15 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { createCanvas, loadImage, registerFont } from 'canvas';
-
-// 한글 폰트 등록
-try {
-  const fontPath = require.resolve('@fontsource/noto-sans-kr/files/noto-sans-kr-latin-400-normal.ttf');
-  registerFont(fontPath, { family: 'Noto Sans KR' });
-} catch (e) {
-  console.warn('폰트 등록 실패:', e);
-}
+import { createCanvas, loadImage } from 'canvas';
 
 const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
@@ -67,13 +59,13 @@ export async function POST(request: NextRequest) {
     ctx.fillStyle = '#1a1a1a';
     ctx.textAlign = 'center';
 
-    // 출생년도 그리기
-    ctx.font = 'bold 50px "Noto Sans KR", Arial';
-    ctx.fillText(`${birthYear}년생`, 300, 50);
+    // 출생년도 그리기 (훨씬 큼)
+    ctx.font = 'bold 60px sans-serif';
+    ctx.fillText(`${birthYear}년생`, 300, 55);
 
-    // 이름 그리기
-    ctx.font = 'bold 80px "Noto Sans KR", Arial';
-    ctx.fillText(name, 300, 465);
+    // 이름 그리기 (매우 큼)
+    ctx.font = 'bold 120px sans-serif';
+    ctx.fillText(name, 300, 460);
 
     // PNG로 변환
     const pngBuffer = canvas.toBuffer('image/png');

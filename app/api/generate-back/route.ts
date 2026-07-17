@@ -2,17 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { createCanvas, registerFont } from 'canvas';
-
-// 한글 폰트 등록 (Noto Serif KR)
-try {
-  const fontPathSans = require.resolve('@fontsource/noto-sans-kr/files/noto-sans-kr-latin-400-normal.ttf');
-  const fontPathSerif = require.resolve('@fontsource/noto-serif-kr/files/noto-serif-kr-latin-400-normal.ttf');
-  registerFont(fontPathSans, { family: 'Noto Sans KR' });
-  registerFont(fontPathSerif, { family: 'Noto Serif KR' });
-} catch (e) {
-  console.warn('폰트 등록 실패:', e);
-}
+import { createCanvas } from 'canvas';
 
 const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
@@ -63,16 +53,16 @@ export async function POST(request: NextRequest) {
     ctx.fillStyle = '#e74c3c';
     ctx.textAlign = 'center';
 
-    // 텍스트 길이에 따라 폰트 크기 조정
-    let fontSize = 90;
+    // 텍스트 길이에 따라 폰트 크기 조정 (훨씬 큼)
+    let fontSize = 110;
     if (text.length > 12) {
-      fontSize = 70;
+      fontSize = 85;
     } else if (text.length > 8) {
-      fontSize = 80;
+      fontSize = 100;
     }
 
-    ctx.font = `italic bold ${fontSize}px "Noto Serif KR", Georgia`;
-    ctx.fillText(text.substring(0, 20), 300, 270);
+    ctx.font = `italic bold ${fontSize}px serif`;
+    ctx.fillText(text.substring(0, 20), 300, 275);
 
     // 하단 선 장식
     ctx.strokeStyle = '#e74c3c';
