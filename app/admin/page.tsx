@@ -52,6 +52,20 @@ export default function AdminPage() {
     return new Date(dateString).toLocaleString('ko-KR');
   };
 
+  const downloadImage = (imageUrl: string, name: string) => {
+    if (!imageUrl) {
+      alert('다운로드할 이미지가 없습니다');
+      return;
+    }
+
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `${name}_${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const getImageArray = (imageUrl: string) => {
     if (!imageUrl) return [];
     // Base64는 그대로, URL 경로들은 쉼표로 구분
@@ -166,12 +180,22 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* 이미지 미리보기 */}
+                    {/* 앞면 이미지 */}
                     <div style={{ marginBottom: '20px' }}>
-                      <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', marginBottom: '8px' }}>앞면 이미지</h3>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', margin: 0 }}>👤 앞면 이미지</h3>
+                        {selectedOrder.frontImageUrl && (
+                          <button
+                            onClick={() => downloadImage(selectedOrder.frontImageUrl, `앞면_${selectedOrder.customerName}`)}
+                            style={{ padding: '4px 8px', fontSize: '12px', background: '#007bff', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+                          >
+                            📥 다운로드
+                          </button>
+                        )}
+                      </div>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         {getImageArray(selectedOrder.frontImageUrl).map((img, idx) => (
-                          <div key={idx} style={{ width: '80px', height: '80px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                          <div key={idx} style={{ width: '120px', height: '120px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
                             {img.startsWith('data:') || img.startsWith('http') ? (
                               <img
                                 src={img}
@@ -188,11 +212,22 @@ export default function AdminPage() {
                       </div>
                     </div>
 
+                    {/* 뒷면 이미지 */}
                     <div>
-                      <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', marginBottom: '8px' }}>뒷면 이미지</h3>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', margin: 0 }}>⭐ 뒷면 이미지</h3>
+                        {selectedOrder.backImageUrl && (
+                          <button
+                            onClick={() => downloadImage(selectedOrder.backImageUrl, `뒷면_${selectedOrder.customerName}`)}
+                            style={{ padding: '4px 8px', fontSize: '12px', background: '#007bff', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+                          >
+                            📥 다운로드
+                          </button>
+                        )}
+                      </div>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         {getImageArray(selectedOrder.backImageUrl).map((img, idx) => (
-                          <div key={idx} style={{ width: '80px', height: '80px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                          <div key={idx} style={{ width: '120px', height: '120px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
                             {img.startsWith('data:') || img.startsWith('http') ? (
                               <img
                                 src={img}
