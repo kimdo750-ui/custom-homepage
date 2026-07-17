@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import KonvaCanvas from './KonvaCanvas';
+import DesignPanel from './DesignPanel';
 import ImageDesignPanel from './ImageDesignPanel';
 
 interface DesignElement {
@@ -149,12 +150,24 @@ export default function ClothDesigner() {
     <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
       {/* 왼쪽 패널 */}
       <div className="lg:col-span-1">
-        <ImageDesignPanel
+        {/* 문구 디자인 */}
+        <DesignPanel
           clothColor={clothColor}
           onClothColorChange={setClothColor}
-          onAddFrontImage={handleAddFrontDesign}
-          onAddBackImage={handleAddBackDesign}
+          onAddFrontDesign={handleAddFrontDesign}
+          onAddBackDesign={handleAddBackDesign}
         />
+
+        {/* 이미지 디자인 */}
+        <div className="mt-6">
+          <h3 className="text-lg font-bold mb-4 px-6">또는 이미지로 디자인</h3>
+          <ImageDesignPanel
+            clothColor={clothColor}
+            onClothColorChange={() => {}}
+            onAddFrontImage={handleAddFrontDesign}
+            onAddBackImage={handleAddBackDesign}
+          />
+        </div>
 
         {elements.length > 0 && (
           <div className="bg-white rounded-lg shadow p-6 mt-6">
