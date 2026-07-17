@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import KonvaCanvas from './KonvaCanvas';
-import DesignPanel from './DesignPanel';
+import ImageDesignPanel from './ImageDesignPanel';
 
 interface DesignElement {
   id: string;
@@ -149,11 +149,11 @@ export default function ClothDesigner() {
     <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
       {/* 왼쪽 패널 */}
       <div className="lg:col-span-1">
-        <DesignPanel
+        <ImageDesignPanel
           clothColor={clothColor}
           onClothColorChange={setClothColor}
-          onAddFrontDesign={handleAddFrontDesign}
-          onAddBackDesign={handleAddBackDesign}
+          onAddFrontImage={handleAddFrontDesign}
+          onAddBackImage={handleAddBackDesign}
         />
 
         {elements.length > 0 && (
