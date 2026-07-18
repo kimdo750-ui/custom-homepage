@@ -6,7 +6,15 @@ import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [showDesigner, setShowDesigner] = useState<'none' | 'text' | 'image'>('none');
+  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (showDesigner === 'image') {
@@ -64,7 +72,7 @@ export default function Home() {
       {/* 배너 */}
       <section style={{ background: 'linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%)', padding: '60px 20px', textAlign: 'center' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '32px', marginBottom: '12px', color: '#1a1a1a', fontWeight: 700 }}>
+          <h2 style={{ fontSize: isMobile ? '18px' : '32px', marginBottom: '12px', color: '#1a1a1a', fontWeight: 700 }}>
             당신의 이야기를 옷에 담다
           </h2>
           <p style={{ fontSize: '16px', color: '#666', marginBottom: '24px', lineHeight: 1.6 }}>
