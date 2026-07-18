@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     ctx.font = `bold ${fontSize}px serif`;
 
     try {
-      ctx.fillText(text.substring(0, 20), 600, 480);  // 중앙에 표시
+      ctx.fillText(text.substring(0, 20), 600, 420);  // 위로 조정해서 겹침 해결
       console.log('텍스트 렌더링 성공:', text);
     } catch (textError) {
       console.error('텍스트 렌더링 오류:', textError);
