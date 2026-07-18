@@ -52,6 +52,8 @@ export default function Home() {
     );
   }
 
+  const sectionPadding = isMobile ? '30px 20px' : '60px 20px';
+
   return (
     <div style={{ fontFamily: '"Noto Sans KR", sans-serif', minHeight: '100vh', background: '#ffffff', color: '#1a1a1a' }}>
       {/* 헤더 */}
@@ -70,7 +72,7 @@ export default function Home() {
       </header>
 
       {/* 배너 */}
-      <section style={{ background: 'linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%)', padding: '60px 20px', textAlign: 'center' }}>
+      <section style={{ background: 'linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%)', padding: sectionPadding, textAlign: 'center' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <h2 style={{ fontSize: isMobile ? '26px' : '32px', marginBottom: '12px', color: '#1a1a1a', fontWeight: 700, whiteSpace: 'nowrap' }}>
             당신의 이야기를 옷에 담다
@@ -91,7 +93,7 @@ export default function Home() {
       </section>
 
       {/* 특징 섹션 */}
-      <section style={{ padding: '60px 20px', background: '#f9f9f9' }}>
+      <section style={{ padding: sectionPadding, background: '#f9f9f9' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '28px', fontWeight: 700, textAlign: 'center', marginBottom: '40px', color: '#1a1a1a' }}>
             3가지 특징
@@ -113,7 +115,7 @@ export default function Home() {
       </section>
 
       {/* 디자인 방식 선택 */}
-      <section style={{ padding: '60px 20px', background: '#f9f9f9' }}>
+      <section style={{ padding: sectionPadding, background: '#f9f9f9' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '28px', fontWeight: 700, textAlign: 'center', marginBottom: '40px', color: '#1a1a1a' }}>
             두 가지 방식으로 디자인하기
@@ -175,7 +177,7 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '60px 20px', background: '#2563EB' }}>
+      <section style={{ padding: sectionPadding, background: '#2563EB' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', textAlign: 'center', color: 'white' }}>
           <h2 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '16px' }}>세상에 하나뿐인 티셔츠</h2>
           <p style={{ fontSize: '16px', marginBottom: '24px', opacity: 0.9 }}>지금 바로 당신의 이야기를 디자인해보세요</p>
