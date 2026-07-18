@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
       fontSize = 230;
     }
 
-    // 텍스트 렌더링 (Linux 기본 글꼴)
-    ctx.font = `bold ${fontSize}px "DejaVu Sans", "Liberation Sans", sans-serif`;
+    // 텍스트 렌더링 (모든 시스템에서 지원하는 기본 글꼴)
+    ctx.font = `bold ${fontSize}px serif`;
 
     try {
       ctx.fillText(text.substring(0, 20), 600, 420);
