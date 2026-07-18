@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
       fontSize = 230;
     }
 
-    // 텍스트 렌더링 (모든 시스템에서 지원하는 기본 글꼴)
-    ctx.font = `bold ${fontSize}px serif`;
+    // 텍스트 렌더링
+    ctx.font = `${fontSize}px`;
 
     try {
       ctx.fillText(text.substring(0, 20), 600, 420);

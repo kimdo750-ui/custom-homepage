@@ -95,8 +95,8 @@ export async function POST(request: NextRequest) {
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
 
-    // 출생년도 그리기 (모든 시스템에서 지원하는 기본 글꼴)
-    ctx.font = 'bold 120px serif';
+    // 출생년도 그리기
+    ctx.font = '120px';
     try {
       ctx.fillText(`${birthYear}`, 600, 110);
       console.log('출생년도 텍스트 렌더링 성공:', birthYear);
