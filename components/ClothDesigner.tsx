@@ -47,14 +47,15 @@ export default function ClothDesigner() {
   const backImageUrl = backImageMap[clothColor] || backImageMap['white'];
 
   const handleAddFrontDesign = (result: any) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const newElement: DesignElement = {
       id: Date.now().toString(),
       type: 'image',
       position: 'front',
-      x: 100,
-      y: 150,
-      width: 400,
-      height: 300,
+      x: isMobile ? 20 : 100,
+      y: isMobile ? 50 : 150,
+      width: isMobile ? 200 : 400,
+      height: isMobile ? 150 : 300,
       rotation: 0,
       src: result.imageUrl,
     };
@@ -62,14 +63,15 @@ export default function ClothDesigner() {
   };
 
   const handleAddBackDesign = (result: any) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const newElement: DesignElement = {
       id: Date.now().toString(),
       type: 'image',
       position: 'back',
-      x: 100,
-      y: 150,
-      width: 400,
-      height: 300,
+      x: isMobile ? 20 : 100,
+      y: isMobile ? 50 : 150,
+      width: isMobile ? 200 : 400,
+      height: isMobile ? 150 : 300,
       rotation: 0,
       src: result.imageUrl,
     };

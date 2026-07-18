@@ -64,8 +64,9 @@ export default function KonvaCanvas({
     startAngle: number;
   } | null>(null);
 
-  const CANVAS_WIDTH = typeof window !== 'undefined' && window.innerWidth < 768 ? window.innerWidth - 40 : 480;
-  const [CANVAS_HEIGHT, setCANVAS_HEIGHT] = useState(1143);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const CANVAS_WIDTH = isMobile ? window.innerWidth - 30 : 480;
+  const [CANVAS_HEIGHT, setCANVAS_HEIGHT] = useState(isMobile ? 720 : 1143);
 
   // 옷 이미지 로드
   useEffect(() => {
