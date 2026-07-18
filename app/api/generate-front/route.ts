@@ -60,9 +60,9 @@ export async function POST(request: NextRequest) {
       throw new Error(`띠그림 파일을 찾을 수 없습니다: ${zodiacName}.png (경로: ${zodiacImagePath})`);
     }
 
-    // Canvas 생성 (1200x960 - 2배 크기)
+    // Canvas 생성 (1200x1050)
     console.log('Canvas 생성 시작...');
-    const canvas = createCanvas(1200, 960);
+    const canvas = createCanvas(1200, 1050);
     const ctx = canvas.getContext('2d');
     console.log('Canvas 생성 완료');
 
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     // 이름 그리기
     ctx.font = 'bold 160px SuseongDotum';
     try {
-      ctx.fillText(name, 600, 950);
+      ctx.fillText(name, 600, 1000);
       console.log('이름 텍스트 렌더링 성공:', name);
     } catch (e) {
       console.error('이름 렌더링 오류:', e);
