@@ -164,11 +164,11 @@ export default function DesignPanel({
   };
 
   return (
-    <div className="bg-orange-50 rounded-lg p-6" style={{ backgroundColor: '#F9F8F6' }}>
+    <div className="bg-orange-50 rounded-lg p-6" style={{ backgroundColor: '#FAFBF9' }}>
       <div className="space-y-6">
         {/* 옷 색상 */}
         <div>
-          <h3 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>옷 색상 선택</h3>
+          <h3 className="text-base font-bold mb-4" style={{ color: '#222B24' }}>옷 색상 선택</h3>
         <div className="grid grid-cols-2 gap-2.5">
           {[
             { name: '흰색', value: 'white' },
@@ -186,9 +186,9 @@ export default function DesignPanel({
                   : 'text-gray-700 hover:shadow-md bg-white border border-gray-200'
               }`}
               style={{
-                backgroundColor: clothColor === color.value ? '#6E5F55' : 'white',
-                borderColor: clothColor === color.value ? '#6E5F55' : '#e5e7eb',
-                color: clothColor === color.value ? 'white' : '#2C2A29'
+                backgroundColor: clothColor === color.value ? '#5A6E5D' : 'white',
+                borderColor: clothColor === color.value ? '#5A6E5D' : '#e5e7eb',
+                color: clothColor === color.value ? 'white' : '#222B24'
               }}
             >
               {color.name}
@@ -199,10 +199,10 @@ export default function DesignPanel({
 
         {/* 앞면 */}
         <div>
-          <h3 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>앞면 디자인</h3>
+          <h3 className="text-base font-bold mb-4" style={{ color: '#222B24' }}>앞면 디자인</h3>
           <div className="space-y-3">
             <div>
-              <label className="block text-xs font-semibold mb-2" style={{ color: '#2C2A29' }}>이름 <span className="text-red-500">*</span></label>
+              <label className="block text-xs font-semibold mb-2" style={{ color: '#222B24' }}>이름 <span className="text-red-500">*</span></label>
               <input
                 type="text"
                 value={name}
@@ -211,15 +211,15 @@ export default function DesignPanel({
                 className="w-full px-3 py-2 text-sm rounded-lg transition border focus:outline-none"
                 style={{
                   backgroundColor: 'white',
-                  borderColor: '#D1C4B9',
-                  color: '#2C2A29'
+                  borderColor: '#D2DDD4',
+                  color: '#222B24'
                 }}
                 maxLength={10}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold mb-2" style={{ color: '#2C2A29' }}>출생년도 <span className="text-red-500">*</span></label>
+              <label className="block text-xs font-semibold mb-2" style={{ color: '#222B24' }}>출생년도 <span className="text-red-500">*</span></label>
               <input
                 type="number"
                 value={birthYear}
@@ -228,8 +228,8 @@ export default function DesignPanel({
                 className="w-full px-3 py-2 text-sm rounded-lg transition border focus:outline-none"
                 style={{
                   backgroundColor: 'white',
-                  borderColor: '#D1C4B9',
-                  color: '#2C2A29'
+                  borderColor: '#D2DDD4',
+                  color: '#222B24'
                 }}
                 min={1900}
                 max={2024}
@@ -237,9 +237,9 @@ export default function DesignPanel({
             </div>
 
             {zodiac && (
-              <div className="p-3 rounded-lg border" style={{ backgroundColor: '#F9F8F6', borderColor: '#D1C4B9' }}>
-                <p className="text-xs font-semibold mb-1" style={{ color: '#6E5F55' }}>띠:</p>
-                <p className="text-sm font-bold" style={{ color: '#6E5F55' }}>{zodiac}</p>
+              <div className="p-3 rounded-lg border" style={{ backgroundColor: '#F9F8F6', borderColor: '#D2DDD4' }}>
+                <p className="text-xs font-semibold mb-1" style={{ color: '#5A6E5D' }}>띠:</p>
+                <p className="text-sm font-bold" style={{ color: '#5A6E5D' }}>{zodiac}</p>
               </div>
             )}
 
@@ -247,7 +247,7 @@ export default function DesignPanel({
               onClick={handleAddFrontDesign}
               className="w-full font-bold py-3 rounded-lg shadow-sm transition transform hover:scale-105 hover:shadow-lg text-sm mt-2 text-white"
               style={{
-                backgroundColor: '#6E5F55'
+                backgroundColor: '#5A6E5D'
               }}
             >
               앞면 추가하기
@@ -257,7 +257,7 @@ export default function DesignPanel({
 
         {/* 뒷면 */}
         <div>
-          <h3 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>뒷면 디자인</h3>
+          <h3 className="text-base font-bold mb-4" style={{ color: '#222B24' }}>뒷면 디자인</h3>
 
           <div className="space-y-3">
             <div className="grid grid-cols-3 gap-2">
@@ -265,9 +265,9 @@ export default function DesignPanel({
                 onClick={() => setBackMode('quote')}
                 className="p-2.5 rounded-lg font-semibold text-sm transition transform hover:scale-105"
                 style={{
-                  backgroundColor: backMode === 'quote' ? '#6E5F55' : 'white',
-                  color: backMode === 'quote' ? 'white' : '#2C2A29',
-                  border: backMode === 'quote' ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                  backgroundColor: backMode === 'quote' ? '#5A6E5D' : 'white',
+                  color: backMode === 'quote' ? 'white' : '#222B24',
+                  border: backMode === 'quote' ? '2px solid #5A6E5D' : '1px solid #D2DDD4'
                 }}
               >
                 명언
@@ -276,9 +276,9 @@ export default function DesignPanel({
                 onClick={() => setBackMode('constellation')}
                 className="p-2.5 rounded-lg font-semibold text-sm transition transform hover:scale-105"
                 style={{
-                  backgroundColor: backMode === 'constellation' ? '#6E5F55' : 'white',
-                  color: backMode === 'constellation' ? 'white' : '#2C2A29',
-                  border: backMode === 'constellation' ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                  backgroundColor: backMode === 'constellation' ? '#5A6E5D' : 'white',
+                  color: backMode === 'constellation' ? 'white' : '#222B24',
+                  border: backMode === 'constellation' ? '2px solid #5A6E5D' : '1px solid #D2DDD4'
                 }}
               >
                 별자리
@@ -287,9 +287,9 @@ export default function DesignPanel({
                 onClick={() => setBackMode('custom')}
                 className="p-2.5 rounded-lg font-semibold text-sm transition transform hover:scale-105"
                 style={{
-                  backgroundColor: backMode === 'custom' ? '#6E5F55' : 'white',
-                  color: backMode === 'custom' ? 'white' : '#2C2A29',
-                  border: backMode === 'custom' ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                  backgroundColor: backMode === 'custom' ? '#5A6E5D' : 'white',
+                  color: backMode === 'custom' ? 'white' : '#222B24',
+                  border: backMode === 'custom' ? '2px solid #5A6E5D' : '1px solid #D2DDD4'
                 }}
               >
                 직접입력
@@ -307,9 +307,9 @@ export default function DesignPanel({
                       onClick={() => handleCategoryChange(cat)}
                       className="p-2.5 rounded-lg text-xs font-semibold transition"
                       style={{
-                        backgroundColor: selectedCategory === cat ? '#6E5F55' : 'white',
-                        color: selectedCategory === cat ? 'white' : '#2C2A29',
-                        border: selectedCategory === cat ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                        backgroundColor: selectedCategory === cat ? '#5A6E5D' : 'white',
+                        color: selectedCategory === cat ? 'white' : '#222B24',
+                        border: selectedCategory === cat ? '2px solid #5A6E5D' : '1px solid #D2DDD4'
                       }}
                     >
                       {cat === 'love' && '❤️ 사랑'}
@@ -328,9 +328,9 @@ export default function DesignPanel({
                       onClick={() => setSelectedQuote(quote.text)}
                       className="p-2.5 rounded-lg text-xs text-left font-semibold transition"
                       style={{
-                        backgroundColor: selectedQuote === quote.text ? '#6E5F55' : 'white',
-                        color: selectedQuote === quote.text ? 'white' : '#2C2A29',
-                        border: selectedQuote === quote.text ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                        backgroundColor: selectedQuote === quote.text ? '#5A6E5D' : 'white',
+                        color: selectedQuote === quote.text ? 'white' : '#222B24',
+                        border: selectedQuote === quote.text ? '2px solid #5A6E5D' : '1px solid #D2DDD4'
                       }}
                       title={quote.text}
                     >
@@ -352,9 +352,9 @@ export default function DesignPanel({
                     onClick={() => setSelectedConstellation(const_item.name)}
                     className="p-2.5 rounded-lg text-xs font-semibold transition"
                     style={{
-                      backgroundColor: selectedConstellation === const_item.name ? '#6E5F55' : 'white',
-                      color: selectedConstellation === const_item.name ? 'white' : '#2C2A29',
-                      border: selectedConstellation === const_item.name ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                      backgroundColor: selectedConstellation === const_item.name ? '#5A6E5D' : 'white',
+                      color: selectedConstellation === const_item.name ? 'white' : '#222B24',
+                      border: selectedConstellation === const_item.name ? '2px solid #5A6E5D' : '1px solid #D2DDD4'
                     }}
                   >
                     {const_item.symbol} {const_item.name}
@@ -382,7 +382,7 @@ export default function DesignPanel({
               onClick={handleAddBackDesign}
               className="w-full font-bold py-3 rounded-lg shadow-sm transition transform hover:scale-105 hover:shadow-lg text-sm mt-2 text-white"
               style={{
-                backgroundColor: '#6E5F55'
+                backgroundColor: '#5A6E5D'
               }}
             >
               뒷면 추가하기

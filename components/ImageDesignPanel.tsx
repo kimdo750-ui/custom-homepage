@@ -114,11 +114,11 @@ export default function ImageDesignPanel({
   };
 
   return (
-    <div className="bg-orange-50 rounded-lg p-6" style={{ backgroundColor: '#F9F8F6' }}>
+    <div className="bg-orange-50 rounded-lg p-6" style={{ backgroundColor: '#FAFBF9' }}>
       <div className="space-y-6">
         {/* 옷 색상 */}
         <div>
-          <h2 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>옷 색상 선택</h2>
+          <h2 className="text-base font-bold mb-4" style={{ color: '#222B24' }}>옷 색상 선택</h2>
         <div className="grid grid-cols-2 gap-2">
           {[
             { name: '흰색', value: 'white' },
@@ -132,9 +132,9 @@ export default function ImageDesignPanel({
               onClick={() => onClothColorChange(color.value)}
               className="p-3 rounded-lg font-semibold text-sm transition transform hover:scale-105"
               style={{
-                backgroundColor: clothColor === color.value ? '#6E5F55' : 'white',
-                color: clothColor === color.value ? 'white' : '#2C2A29',
-                border: clothColor === color.value ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                backgroundColor: clothColor === color.value ? '#5A6E5D' : 'white',
+                color: clothColor === color.value ? 'white' : '#222B24',
+                border: clothColor === color.value ? '2px solid #5A6E5D' : '1px solid #D2DDD4'
               }}
             >
               {color.name}
@@ -145,7 +145,7 @@ export default function ImageDesignPanel({
 
         {/* 앞면 이미지 */}
         <div>
-          <h2 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>앞면 이미지</h2>
+          <h2 className="text-base font-bold mb-4" style={{ color: '#222B24' }}>앞면 이미지</h2>
           <div className="space-y-3">
           <input
             ref={frontInputRef}
@@ -160,7 +160,7 @@ export default function ImageDesignPanel({
               disabled={frontLoading}
               className="w-full p-3 rounded-lg font-semibold text-sm transition transform hover:scale-105 text-white"
               style={{
-                backgroundColor: frontLoading ? '#e5e7eb' : '#6E5F55',
+                backgroundColor: frontLoading ? '#e5e7eb' : '#5A6E5D',
                 color: frontLoading ? '#9ca3af' : 'white',
                 cursor: frontLoading ? 'not-allowed' : 'pointer'
               }}
@@ -172,7 +172,7 @@ export default function ImageDesignPanel({
 
         {/* 뒷면 이미지 */}
         <div>
-          <h2 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>뒷면 이미지</h2>
+          <h2 className="text-base font-bold mb-4" style={{ color: '#222B24' }}>뒷면 이미지</h2>
           <div className="space-y-3">
           <input
             ref={backInputRef}
@@ -187,7 +187,7 @@ export default function ImageDesignPanel({
               disabled={backLoading}
               className="w-full p-3 rounded-lg font-semibold text-sm transition transform hover:scale-105 text-white"
               style={{
-                backgroundColor: backLoading ? '#e5e7eb' : '#6E5F55',
+                backgroundColor: backLoading ? '#e5e7eb' : '#5A6E5D',
                 color: backLoading ? '#9ca3af' : 'white',
                 cursor: backLoading ? 'not-allowed' : 'pointer'
               }}
