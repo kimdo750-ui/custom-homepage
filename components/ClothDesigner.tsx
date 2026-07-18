@@ -167,7 +167,10 @@ export default function ClothDesigner() {
             {!showOrderForm && (
               <button
                 onClick={() => setShowOrderForm(true)}
-                className="w-full bg-success-600 hover:bg-success-700 text-white font-semibold py-2.5 rounded-lg shadow-sm"
+                className="w-full text-white font-semibold py-3 rounded-lg shadow-sm transition hover:opacity-90"
+                style={{
+                  backgroundColor: '#5A6E5D'
+                }}
               >
                 🛒 주문하기
               </button>
@@ -199,14 +202,21 @@ export default function ClothDesigner() {
                   <button
                     onClick={handleOrderSubmit}
                     disabled={isOrderLoading}
-                    className="flex-1 bg-success-600 hover:bg-success-700 disabled:bg-gray-400 text-white font-semibold py-2 rounded-lg shadow-sm"
+                    className="flex-1 text-white font-semibold py-2 rounded-lg shadow-sm transition hover:opacity-90 disabled:opacity-50"
+                    style={{
+                      backgroundColor: '#5A6E5D'
+                    }}
                   >
                     {isOrderLoading ? '저장 중...' : '주문 확정'}
                   </button>
 
                   <button
                     onClick={() => setShowOrderForm(false)}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-2 rounded-lg"
+                    className="flex-1 font-semibold py-2 rounded-lg transition hover:opacity-80"
+                    style={{
+                      backgroundColor: '#D2DDD4',
+                      color: '#222B24'
+                    }}
                   >
                     취소
                   </button>
@@ -216,7 +226,11 @@ export default function ClothDesigner() {
 
             <button
               onClick={() => setElements([])}
-              className="w-full mt-3 bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 rounded-lg"
+              className="w-full mt-3 font-medium py-2 rounded-lg transition hover:opacity-80"
+              style={{
+                backgroundColor: '#D2DDD4',
+                color: '#222B24'
+              }}
             >
               모두 초기화
             </button>
