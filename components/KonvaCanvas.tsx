@@ -444,21 +444,19 @@ export default function KonvaCanvas({
       const element = elements.find((el) => el.id === selectedId);
 
       if (element) {
-        // Alt키가 눌려있으면 회전, 아니면 핀치
-        if (e.altKey) {
-          setTwoFingerRotating({
-            id: selectedId,
-            startRotation: element.rotation,
-            startAngle: angle,
-          });
-        } else {
-          setPinching({
-            id: selectedId,
-            startDistance: distance,
-            startWidth: element.width,
-            startHeight: element.height,
-          });
-        }
+        // 두 손가락 회전 (항상 회전)
+        setTwoFingerRotating({
+          id: selectedId,
+          startRotation: element.rotation,
+          startAngle: angle,
+        });
+        // 핀치는 동시에 처리
+        setPinching({
+          id: selectedId,
+          startDistance: distance,
+          startWidth: element.width,
+          startHeight: element.height,
+        });
       }
       return;
     }
@@ -521,32 +519,31 @@ export default function KonvaCanvas({
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
-    // 두 손가락 회전
-    if (e.touches.length === 2 && twoFingerRotating) {
+    // 두 손가락 제스처 (회전 + 핀치 동시)
+    if (e.touches.length === 2 && (twoFingerRotating || pinching)) {
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const currentAngle = getAngleBetweenTouches(touch1, touch2);
-      const deltaAngle = currentAngle - twoFingerRotating.startAngle;
-
-      if (onUpdateElement) {
-        onUpdateElement(twoFingerRotating.id, {
-          rotation: (twoFingerRotating.startRotation + deltaAngle) % 360,
-        });
-      }
-      return;
-    }
-
-    // 핀치 제스처 (크기 조절)
-    if (e.touches.length === 2 && pinching) {
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
       const distance = getDistance(touch1, touch2);
-      const scale = distance / pinching.startDistance;
+      const id = twoFingerRotating?.id || pinching?.id;
 
-      if (onUpdateElement) {
-        onUpdateElement(pinching.id, {
-          width: Math.max(50, pinching.startWidth * scale),
-          height: Math.max(50, pinching.startHeight * scale),
+      if (onUpdateElement && id) {
+        const updates: any = {};
+
+        // 회전 처리
+        if (twoFingerRotating) {
+          const deltaAngle = currentAngle - twoFingerRotating.startAngle;
+          updates.rotation = (twoFingerRotating.startRotation + deltaAngle) % 360;
+        }
+
+        // 크기 조절 처리
+        if (pinching) {
+          const scale = distance / pinching.startDistance;
+          updates.width = Math.max(50, pinching.startWidth * scale);
+          updates.height = Math.max(50, pinching.startHeight * scale);
+        }
+
+        onUpdateElement(id, updates);
         });
       }
       return;
