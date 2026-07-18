@@ -27,7 +27,7 @@ export default function Home() {
       <div style={{ fontFamily: '"Noto Sans KR", sans-serif' }}>
         <header style={{ background: '#ffffff', borderBottom: '1px solid #e8e8e8', padding: '12px 0', position: 'sticky', top: 0, zIndex: 40 }}>
           <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1a1a1a', textDecoration: 'none' }}>우리이야기</h1>
+            <img src="/logo.png" alt="우리이야기" style={{ height: '40px', objectFit: 'contain' }} />
             <button
               onClick={() => setShowDesigner('none')}
               style={{ padding: '10px 20px', background: '#f0f0f0', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px', fontWeight: 500 }}
@@ -59,7 +59,7 @@ export default function Home() {
       {/* 헤더 */}
       <header style={{ background: '#ffffff', borderBottom: '1px solid #e8e8e8', padding: '12px 0', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1a1a1a', textDecoration: 'none' }}>우리이야기</h1>
+          <img src="/logo.png" alt="우리이야기" style={{ height: '40px', objectFit: 'contain' }} />
           <button
             onClick={() => setShowDesigner('text')}
             style={{ padding: '12px 30px', background: '#2563EB', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, transition: 'all 0.2s' }}
@@ -283,7 +283,7 @@ export default function Home() {
       {/* 푸터 */}
       <footer style={{ background: '#1a1a1a', color: 'white', padding: '40px 20px' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', textAlign: 'center' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px' }}>우리이야기</h3>
+          <img src="/logo.png" alt="우리이야기" style={{ height: '40px', objectFit: 'contain', margin: '0 auto 8px', display: 'block', filter: 'brightness(0) invert(1)' }} />
           <p style={{ fontSize: '14px', color: '#999', marginBottom: '8px' }}>당신의 이야기를 옷에 담다</p>
           <p style={{ fontSize: '12px', color: '#666' }}>© 2026 우리이야기. All rights reserved.</p>
         </div>
