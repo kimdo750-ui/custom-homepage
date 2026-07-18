@@ -61,8 +61,8 @@ export async function POST(request: NextRequest) {
       fontSize = 230;
     }
 
-    // 수성돋움체 글꼴 (파일의 내장 이름 사용)
-    ctx.font = `bold ${fontSize}px "Suseong Dotum"`;
+    // 기본 serif 글꼴 (프로덕션 호환)
+    ctx.font = `bold ${fontSize}px serif`;
 
     try {
       ctx.fillText(text.substring(0, 20), 600, 570);
