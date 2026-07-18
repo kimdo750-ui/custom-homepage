@@ -107,8 +107,8 @@ export async function POST(request: NextRequest) {
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
 
-    // 출생년도 그리기 (2배 크기) - 붓글씨
-    ctx.font = 'bold 120px "Gungsuh", "Gungsuh Che", "HM Jingga", sans-serif';
+    // 출생년도 그리기 (기본 시스템 글꼴)
+    ctx.font = 'bold 120px serif';
     try {
       ctx.fillText(`${birthYear}`, 600, 110);
       console.log('출생년도 텍스트 렌더링 성공:', birthYear);
@@ -116,8 +116,8 @@ export async function POST(request: NextRequest) {
       console.error('출생년도 렌더링 오류:', e);
     }
 
-    // 이름 그리기 (크기 줄임) - 붓글씨
-    ctx.font = 'bold 160px "Gungsuh", "Gungsuh Che", "HM Jingga", sans-serif';
+    // 이름 그리기 (기본 시스템 글꼴)
+    ctx.font = 'bold 160px serif';
     try {
       ctx.fillText(name, 600, 950);
       console.log('이름 텍스트 렌더링 성공:', name);

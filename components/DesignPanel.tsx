@@ -82,7 +82,7 @@ export default function DesignPanel({
     }
   };
 
-  // 앞면 디자인 추가
+  // 앞면 디자인 추가 (클라이언트 측 텍스트 렌더링)
   const handleAddFrontDesign = async () => {
     if (!name.trim() || !birthYear) {
       alert('이름과 출생년도를 입력해주세요');
@@ -101,10 +101,38 @@ export default function DesignPanel({
         console.log('Front design response:', result);
 
         if (result.imageUrl) {
-          onAddFrontDesign(result);
-          setName('');
-          setBirthYear('');
-          setZodiac('');
+          // 클라이언트 측에서 텍스트 추가
+          const canvas = document.createElement('canvas');
+          canvas.width = 1200;
+          canvas.height = 960;
+          const ctx = canvas.getContext('2d');
+
+          // 배경 이미지 로드
+          const img = new Image();
+          img.onload = () => {
+            ctx!.drawImage(img, 0, 0);
+
+            // 출생년도 텍스트 (검은색, 붓글씨 스타일)
+            ctx!.fillStyle = '#000000';
+            ctx!.font = 'bold 120px "Georgia", "Times New Roman", serif';
+            ctx!.textAlign = 'center';
+            ctx!.fillText(`${birthYear}`, 600, 110);
+
+            // 이름 텍스트 (검은색, 붓글씨 스타일)
+            ctx!.font = 'bold 160px "Georgia", "Times New Roman", serif';
+            ctx!.fillText(name, 600, 950);
+
+            // 최종 이미지
+            const finalImageUrl = canvas.toDataURL('image/png');
+            onAddFrontDesign({
+              ...result,
+              imageUrl: finalImageUrl,
+            });
+            setName('');
+            setBirthYear('');
+            setZodiac('');
+          };
+          img.src = result.imageUrl;
         } else {
           alert('앞면 생성 실패: ' + (result.error || 'Unknown error'));
         }
@@ -115,10 +143,11 @@ export default function DesignPanel({
     }
   };
 
-  // 뒷면 디자인 추가
+  // 뒷면 디자인 추가 (클라이언트 측 텍스트 렌더링)
   const handleAddBackDesign = async () => {
     let backText = '';
     let endpoint = '/api/generate-back';
+    let isQuote = false;
 
     if (backMode === 'constellation') {
       backText = selectedConstellation;
@@ -126,6 +155,7 @@ export default function DesignPanel({
     } else if (backMode === 'quote') {
       backText = selectedQuote;
       endpoint = '/api/get-phrase-image'; // 프리셋 명언은 파일에서 가져옴
+      isQuote = true;
     } else {
       backText = customBackText;
       endpoint = '/api/generate-back';
@@ -148,11 +178,52 @@ export default function DesignPanel({
         console.log('Back design response:', result);
 
         if (result.imageUrl) {
-          onAddBackDesign(result);
-          setSelectedConstellation('');
-          setCustomBackText('');
-          setSelectedQuote(quotes.love[0].text);
-          setSelectedCategory('love');
+          // 명언은 텍스트 없이 반환, 별자리/직접입력은 클라이언트에서 텍스트 추가
+          if (!isQuote) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1200;
+            canvas.height = 960;
+            const ctx = canvas.getContext('2d');
+
+            const img = new Image();
+            img.onload = () => {
+              ctx!.drawImage(img, 0, 0);
+
+              // 텍스트 렌더링 (검은색, 붓글씨 스타일)
+              ctx!.globalAlpha = 1;
+              ctx!.fillStyle = '#000000';
+              ctx!.textAlign = 'center';
+
+              let fontSize = 260;
+              if (backText.length > 12) {
+                fontSize = 200;
+              } else if (backText.length > 8) {
+                fontSize = 230;
+              }
+
+              ctx!.font = `bold ${fontSize}px "Georgia", "Times New Roman", serif`;
+              ctx!.fillText(backText.substring(0, 20), 600, 570);
+
+              const finalImageUrl = canvas.toDataURL('image/png');
+              onAddBackDesign({
+                ...result,
+                imageUrl: finalImageUrl,
+              });
+
+              setSelectedConstellation('');
+              setCustomBackText('');
+              setSelectedQuote(quotes.love[0].text);
+              setSelectedCategory('love');
+            };
+            img.src = result.imageUrl;
+          } else {
+            // 명언은 그대로 반환
+            onAddBackDesign(result);
+            setSelectedConstellation('');
+            setCustomBackText('');
+            setSelectedQuote(quotes.love[0].text);
+            setSelectedCategory('love');
+          }
         } else {
           alert('뒷면 생성 실패: ' + (result.error || 'Unknown error'));
         }

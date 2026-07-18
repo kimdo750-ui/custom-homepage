@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     ctx.arc(600, 160, 64, 0, Math.PI * 2);
     ctx.stroke();
 
-    // 텍스트 렌더링 (검은색 붓글씨)
+    // 텍스트 렌더링 (검은색 - 기본 시스템 글꼴)
     ctx.globalAlpha = 1;
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
@@ -86,15 +86,14 @@ export async function POST(request: NextRequest) {
       fontSize = 230;
     }
 
-    // 붓글씨 글꼴 사용 (궁서 또는 함초롱)
-    ctx.font = `bold ${fontSize}px "Gungsuh", "Gungsuh Che", "HM Jingga", sans-serif`;
+    // 기본 시스템 글꼴 (serif - 붓글씨 스타일 근사)
+    ctx.font = `bold ${fontSize}px serif`;
 
     try {
       ctx.fillText(text.substring(0, 20), 600, 570);
       console.log('텍스트 렌더링 성공:', text);
     } catch (textError) {
       console.error('텍스트 렌더링 오류:', textError);
-      // 텍스트 렌더링 실패해도 배경은 계속 반환
     }
 
     // 하단 선 장식 (2배)
