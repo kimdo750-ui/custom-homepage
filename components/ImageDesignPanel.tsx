@@ -114,11 +114,12 @@ export default function ImageDesignPanel({
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* 옷 색상 */}
-      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">옷 색상</h2>
-        <div className="space-y-2">
+    <div className="bg-orange-50 rounded-lg p-6" style={{ backgroundColor: '#F9F8F6' }}>
+      <div className="space-y-6">
+        {/* 옷 색상 */}
+        <div>
+          <h2 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>옷 색상 선택</h2>
+        <div className="grid grid-cols-2 gap-2">
           {[
             { name: '흰색', value: 'white' },
             { name: '검정', value: 'black' },
@@ -129,32 +130,23 @@ export default function ImageDesignPanel({
             <button
               key={color.value}
               onClick={() => onClothColorChange(color.value)}
-              className={`w-full p-3 sm:p-2 rounded-lg font-medium text-base sm:text-sm transition active:scale-95 ${
-                clothColor === color.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-              }`}
+              className="p-3 rounded-lg font-semibold text-sm transition transform hover:scale-105"
+              style={{
+                backgroundColor: clothColor === color.value ? '#6E5F55' : 'white',
+                color: clothColor === color.value ? 'white' : '#2C2A29',
+                border: clothColor === color.value ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+              }}
             >
               {color.name}
             </button>
           ))}
         </div>
-      </div>
+        </div>
 
-      {/* 앞면 이미지 */}
-      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">👤 앞면</h2>
-        <div className="space-y-3 sm:space-y-4">
-          <div className="text-xs sm:text-sm text-gray-600">
-            <p className="font-medium mb-2">이미지를 업로드하면 자동으로 누끼 처리됩니다</p>
-            {frontPreview && (
-              <div className="mt-3 p-2 bg-gray-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-2">원본 이미지 미리보기</p>
-                <img src={frontPreview} alt="front preview" className="w-full h-auto rounded" />
-              </div>
-            )}
-          </div>
-
+        {/* 앞면 이미지 */}
+        <div>
+          <h2 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>앞면 이미지</h2>
+          <div className="space-y-3">
           <input
             ref={frontInputRef}
             type="file"
@@ -163,34 +155,25 @@ export default function ImageDesignPanel({
             className="hidden"
           />
 
-          <button
-            onClick={() => frontInputRef.current?.click()}
-            disabled={frontLoading}
-            className={`w-full p-3 sm:p-2 rounded-lg font-medium text-base sm:text-sm transition active:scale-95 ${
-              frontLoading
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
-          >
-            {frontLoading ? '누끼 처리 중...' : '앞면 이미지 선택'}
-          </button>
-        </div>
-      </div>
-
-      {/* 뒷면 이미지 */}
-      <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">⭐ 뒷면</h2>
-        <div className="space-y-3 sm:space-y-4">
-          <div className="text-xs sm:text-sm text-gray-600">
-            <p className="font-medium mb-2">이미지를 업로드하면 자동으로 누끼 처리됩니다</p>
-            {backPreview && (
-              <div className="mt-3 p-2 bg-gray-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-2">원본 이미지 미리보기</p>
-                <img src={backPreview} alt="back preview" className="w-full h-auto rounded" />
-              </div>
-            )}
+            <button
+              onClick={() => frontInputRef.current?.click()}
+              disabled={frontLoading}
+              className="w-full p-3 rounded-lg font-semibold text-sm transition transform hover:scale-105 text-white"
+              style={{
+                backgroundColor: frontLoading ? '#e5e7eb' : '#6E5F55',
+                color: frontLoading ? '#9ca3af' : 'white',
+                cursor: frontLoading ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {frontLoading ? '누끼 처리 중...' : '파일 선택'}
+            </button>
           </div>
+        </div>
 
+        {/* 뒷면 이미지 */}
+        <div>
+          <h2 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>뒷면 이미지</h2>
+          <div className="space-y-3">
           <input
             ref={backInputRef}
             type="file"
@@ -199,17 +182,19 @@ export default function ImageDesignPanel({
             className="hidden"
           />
 
-          <button
-            onClick={() => backInputRef.current?.click()}
-            disabled={backLoading}
-            className={`w-full p-3 sm:p-2 rounded-lg font-medium text-base sm:text-sm transition active:scale-95 ${
-              backLoading
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-purple-600 hover:bg-purple-700 text-white'
-            }`}
-          >
-            {backLoading ? '누끼 처리 중...' : '뒷면 이미지 선택'}
-          </button>
+            <button
+              onClick={() => backInputRef.current?.click()}
+              disabled={backLoading}
+              className="w-full p-3 rounded-lg font-semibold text-sm transition transform hover:scale-105 text-white"
+              style={{
+                backgroundColor: backLoading ? '#e5e7eb' : '#6E5F55',
+                color: backLoading ? '#9ca3af' : 'white',
+                cursor: backLoading ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {backLoading ? '누끼 처리 중...' : '파일 선택'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

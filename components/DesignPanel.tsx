@@ -28,7 +28,7 @@ const CONSTELLATIONS = [
 function calculateZodiac(year: number): string {
   if (!year) return '';
   const zodiacIndex = (year - 1900) % 12;
-  const zodiacs = ['쥐', '소', '호랑이', '토끼', '뱀', '말', '양', '원숭이', '닭', '개', '돼지', '쥐'];
+  const zodiacs = ['쥐', '소', '호랑이', '토끼', '뱀', '말', '양', '원숭이', '닭', '개', '돼지', '용'];
   return zodiacs[zodiacIndex] + '띠';
 }
 
@@ -164,11 +164,12 @@ export default function DesignPanel({
   };
 
   return (
-    <div className="space-y-5">
-      {/* 옷 색상 */}
-      <div className="card">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">옷 색상</h3>
-        <div className="space-y-2">
+    <div className="bg-orange-50 rounded-lg p-6" style={{ backgroundColor: '#F9F8F6' }}>
+      <div className="space-y-6">
+        {/* 옷 색상 */}
+        <div>
+          <h3 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>옷 색상 선택</h3>
+        <div className="grid grid-cols-2 gap-2.5">
           {[
             { name: '흰색', value: 'white' },
             { name: '검정', value: 'black' },
@@ -179,115 +180,137 @@ export default function DesignPanel({
             <button
               key={color.value}
               onClick={() => onClothColorChange(color.value)}
-              className={`w-full p-3 rounded-lg font-medium transition ${
+              className={`p-3 rounded-lg font-semibold text-sm transition transform hover:scale-105 ${
                 clothColor === color.value
-                  ? 'bg-primary-600 text-white shadow-sm'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                  ? 'text-white shadow-lg border-2'
+                  : 'text-gray-700 hover:shadow-md bg-white border border-gray-200'
               }`}
+              style={{
+                backgroundColor: clothColor === color.value ? '#6E5F55' : 'white',
+                borderColor: clothColor === color.value ? '#6E5F55' : '#e5e7eb',
+                color: clothColor === color.value ? 'white' : '#2C2A29'
+              }}
             >
               {color.name}
             </button>
           ))}
         </div>
-      </div>
-
-      {/* 앞면 */}
-      <div className="card">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">👤 앞면</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">이름</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="예: 김동일"
-              className="w-full px-3 py-2 text-sm text-gray-900 placeholder-gray-500"
-              maxLength={10}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">출생년도</label>
-            <input
-              type="number"
-              value={birthYear}
-              onChange={handleBirthYearChange}
-              placeholder="예: 1990"
-              className="w-full px-3 py-2 text-sm text-gray-900 placeholder-gray-500"
-              min={1900}
-              max={2024}
-            />
-          </div>
-
-          {zodiac && (
-            <div className="p-3 bg-primary-50 rounded-lg border border-primary-200">
-              <p className="text-xs font-medium text-primary-700">🐯 띠:</p>
-              <p className="text-base font-bold text-primary-600">{zodiac}</p>
-            </div>
-          )}
-
-          <button
-            onClick={handleAddFrontDesign}
-            className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2.5 rounded-lg shadow-sm"
-          >
-            앞면 추가
-          </button>
         </div>
-      </div>
 
-      {/* 뒷면 */}
-      <div className="card">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900">⭐ 뒷면</h3>
+        {/* 앞면 */}
+        <div>
+          <h3 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>앞면 디자인</h3>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-semibold mb-2" style={{ color: '#2C2A29' }}>이름 <span className="text-red-500">*</span></label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="예: 김동일"
+                className="w-full px-3 py-2 text-sm rounded-lg transition border focus:outline-none"
+                style={{
+                  backgroundColor: 'white',
+                  borderColor: '#D1C4B9',
+                  color: '#2C2A29'
+                }}
+                maxLength={10}
+              />
+            </div>
 
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <label className="block text-xs font-semibold mb-2" style={{ color: '#2C2A29' }}>출생년도 <span className="text-red-500">*</span></label>
+              <input
+                type="number"
+                value={birthYear}
+                onChange={handleBirthYearChange}
+                placeholder="예: 1990"
+                className="w-full px-3 py-2 text-sm rounded-lg transition border focus:outline-none"
+                style={{
+                  backgroundColor: 'white',
+                  borderColor: '#D1C4B9',
+                  color: '#2C2A29'
+                }}
+                min={1900}
+                max={2024}
+              />
+            </div>
+
+            {zodiac && (
+              <div className="p-3 rounded-lg border" style={{ backgroundColor: '#F9F8F6', borderColor: '#D1C4B9' }}>
+                <p className="text-xs font-semibold mb-1" style={{ color: '#6E5F55' }}>띠:</p>
+                <p className="text-sm font-bold" style={{ color: '#6E5F55' }}>{zodiac}</p>
+              </div>
+            )}
+
             <button
-              onClick={() => setBackMode('quote')}
-              className={`p-2 rounded-lg font-medium text-sm transition ${
-                backMode === 'quote'
-                  ? 'bg-secondary-600 text-white shadow-sm'
-                  : 'bg-gray-100 hover:bg-gray-200'
-              }`}
+              onClick={handleAddFrontDesign}
+              className="w-full font-bold py-3 rounded-lg shadow-sm transition transform hover:scale-105 hover:shadow-lg text-sm mt-2 text-white"
+              style={{
+                backgroundColor: '#6E5F55'
+              }}
             >
-              💭 명언
-            </button>
-            <button
-              onClick={() => setBackMode('constellation')}
-              className={`p-2 rounded-lg font-medium text-sm transition ${
-                backMode === 'constellation'
-                  ? 'bg-secondary-600 text-white shadow-sm'
-                  : 'bg-gray-100 hover:bg-gray-200'
-              }`}
-            >
-              ✨ 별자리
-            </button>
-            <button
-              onClick={() => setBackMode('custom')}
-              className={`p-2 rounded-lg font-medium text-sm transition ${
-                backMode === 'custom'
-                  ? 'bg-secondary-600 text-white shadow-sm'
-                  : 'bg-gray-100 hover:bg-gray-200'
-              }`}
-            >
-              ✏️ 직접입력
+              앞면 추가하기
             </button>
           </div>
+        </div>
+
+        {/* 뒷면 */}
+        <div>
+          <h3 className="text-base font-bold mb-4" style={{ color: '#2C2A29' }}>뒷면 디자인</h3>
+
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => setBackMode('quote')}
+                className="p-2.5 rounded-lg font-semibold text-sm transition transform hover:scale-105"
+                style={{
+                  backgroundColor: backMode === 'quote' ? '#6E5F55' : 'white',
+                  color: backMode === 'quote' ? 'white' : '#2C2A29',
+                  border: backMode === 'quote' ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                }}
+              >
+                명언
+              </button>
+              <button
+                onClick={() => setBackMode('constellation')}
+                className="p-2.5 rounded-lg font-semibold text-sm transition transform hover:scale-105"
+                style={{
+                  backgroundColor: backMode === 'constellation' ? '#6E5F55' : 'white',
+                  color: backMode === 'constellation' ? 'white' : '#2C2A29',
+                  border: backMode === 'constellation' ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                }}
+              >
+                별자리
+              </button>
+              <button
+                onClick={() => setBackMode('custom')}
+                className="p-2.5 rounded-lg font-semibold text-sm transition transform hover:scale-105"
+                style={{
+                  backgroundColor: backMode === 'custom' ? '#6E5F55' : 'white',
+                  color: backMode === 'custom' ? 'white' : '#2C2A29',
+                  border: backMode === 'custom' ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                }}
+              >
+                직접입력
+              </button>
+            </div>
 
           {backMode === 'quote' && (
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">카테고리</label>
                 <div className="grid grid-cols-2 gap-2">
                   {['love', 'friendship'].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => handleCategoryChange(cat)}
-                      className={`p-2 rounded-lg text-xs font-medium transition ${
-                        selectedCategory === cat
-                          ? 'bg-secondary-600 text-white shadow-sm'
-                          : 'bg-gray-100 hover:bg-gray-200'
-                      }`}
+                      className="p-2.5 rounded-lg text-xs font-semibold transition"
+                      style={{
+                        backgroundColor: selectedCategory === cat ? '#6E5F55' : 'white',
+                        color: selectedCategory === cat ? 'white' : '#2C2A29',
+                        border: selectedCategory === cat ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                      }}
                     >
                       {cat === 'love' && '❤️ 사랑'}
                       {cat === 'friendship' && '🤝 우정'}
@@ -297,17 +320,18 @@ export default function DesignPanel({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">명언 선택</label>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">명언 선택</label>
                 <div className="grid grid-cols-1 gap-2">
                   {(quotes[selectedCategory as keyof typeof quotes] || []).map((quote) => (
                     <button
                       key={quote.text}
                       onClick={() => setSelectedQuote(quote.text)}
-                      className={`p-2 rounded-lg text-xs text-left font-medium transition ${
-                        selectedQuote === quote.text
-                          ? 'bg-secondary-600 text-white shadow-sm'
-                          : 'bg-gray-100 hover:bg-gray-200'
-                      }`}
+                      className="p-2.5 rounded-lg text-xs text-left font-semibold transition"
+                      style={{
+                        backgroundColor: selectedQuote === quote.text ? '#6E5F55' : 'white',
+                        color: selectedQuote === quote.text ? 'white' : '#2C2A29',
+                        border: selectedQuote === quote.text ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                      }}
                       title={quote.text}
                     >
                       <div className="truncate">{quote.text}</div>
@@ -320,17 +344,18 @@ export default function DesignPanel({
 
           {backMode === 'constellation' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">별자리 선택</label>
-              <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+              <label className="block text-sm font-semibold text-gray-900 mb-2">별자리 선택</label>
+              <div className="grid grid-cols-3 gap-2.5 max-h-48 overflow-y-auto">
                 {CONSTELLATIONS.map((const_item) => (
                   <button
                     key={const_item.name}
                     onClick={() => setSelectedConstellation(const_item.name)}
-                    className={`p-2 rounded-lg text-xs font-medium transition ${
-                      selectedConstellation === const_item.name
-                        ? 'bg-secondary-600 text-white shadow-sm'
-                        : 'bg-gray-100 hover:bg-gray-200'
-                    }`}
+                    className="p-2.5 rounded-lg text-xs font-semibold transition"
+                    style={{
+                      backgroundColor: selectedConstellation === const_item.name ? '#6E5F55' : 'white',
+                      color: selectedConstellation === const_item.name ? 'white' : '#2C2A29',
+                      border: selectedConstellation === const_item.name ? '2px solid #6E5F55' : '1px solid #D1C4B9'
+                    }}
                   >
                     {const_item.symbol} {const_item.name}
                   </button>
@@ -341,24 +366,28 @@ export default function DesignPanel({
 
           {backMode === 'custom' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">문구 입력</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">문구 입력</label>
               <textarea
                 value={customBackText}
                 onChange={(e) => setCustomBackText(e.target.value)}
                 placeholder="원하는 문구를 입력하세요..."
-                className="w-full px-3 py-2 text-sm resize-none"
-                rows={3}
+                className="w-full px-3 py-2 text-sm resize-none border border-gray-300 rounded-lg"
+                rows={2}
                 maxLength={15}
               />
             </div>
           )}
 
-          <button
-            onClick={handleAddBackDesign}
-            className="w-full bg-secondary-600 hover:bg-secondary-700 text-white font-semibold py-2.5 rounded-lg shadow-sm"
-          >
-            뒷면 추가
-          </button>
+            <button
+              onClick={handleAddBackDesign}
+              className="w-full font-bold py-3 rounded-lg shadow-sm transition transform hover:scale-105 hover:shadow-lg text-sm mt-2 text-white"
+              style={{
+                backgroundColor: '#6E5F55'
+              }}
+            >
+              뒷면 추가하기
+            </button>
+          </div>
         </div>
       </div>
     </div>

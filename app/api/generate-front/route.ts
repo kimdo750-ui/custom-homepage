@@ -2,13 +2,39 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage, registerFont } from 'canvas';
 
 const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
-export const config = {
-  maxDuration: 60,
-};
+export const maxDuration = 60;
+
+// 붓글씨 글꼴 등록 시도
+try {
+  // Windows 시스템 글꼴 경로 (붓글씨 글자체)
+  const fontPaths = [
+    'C:\\Windows\\Fonts\\gungsuh.ttf',     // 궁서
+    'C:\\Windows\\Fonts\\gungsuhcje.ttf',  // 궁서체
+    'C:\\Windows\\Fonts\\hmjingga.ttf',    // 함초롱 고딕
+  ];
+
+  for (const fontPath of fontPaths) {
+    if (existsSync(fontPath)) {
+      let fontName = 'Gungsuh';
+      if (fontPath.includes('gungsuhcje')) fontName = 'Gungsuh Che';
+      if (fontPath.includes('hmjingga')) fontName = 'HM Jingga';
+
+      try {
+        registerFont(fontPath, { family: fontName });
+        console.log(`붓글씨 글꼴 등록 성공: ${fontName} - ${fontPath}`);
+        break;
+      } catch (e) {
+        console.log(`글꼴 등록 실패: ${fontPath}`);
+      }
+    }
+  }
+} catch (e) {
+  console.log('글꼴 등록 오류:', e);
+}
 
 export async function POST(request: NextRequest) {
   let tempImagePath = '';
@@ -39,33 +65,65 @@ export async function POST(request: NextRequest) {
     const zodiacName = zodiac?.replace(/띠$/, '') || '';
     const zodiacImagePath = join(process.cwd(), 'public', 'zodiac', `${zodiacName}.png`);
 
+    console.log('zodiac:', zodiac);
+    console.log('zodiacName:', zodiacName);
+    console.log('zodiacImagePath:', zodiacImagePath);
+    console.log('File exists:', existsSync(zodiacImagePath));
+
     if (!existsSync(zodiacImagePath)) {
-      throw new Error(`띠그림 파일을 찾을 수 없습니다: ${zodiacName}.png`);
+      throw new Error(`띠그림 파일을 찾을 수 없습니다: ${zodiacName}.png (경로: ${zodiacImagePath})`);
     }
 
     // Canvas 생성 (1200x960 - 2배 크기)
+    console.log('Canvas 생성 시작...');
     const canvas = createCanvas(1200, 960);
     const ctx = canvas.getContext('2d');
+    console.log('Canvas 생성 완료');
 
-    // 배경을 흰색으로 (Remove.bg API로 투명하게 처리)
+    // 배경을 흰색으로
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, 1200, 960);
+    console.log('배경 그리기 완료');
 
-    // 띠그림 로드 및 그리기 (2배)
-    const zodiacImage = await loadImage(zodiacImagePath);
+    // 띠그림 로드 및 그리기 (2배) - Buffer로 읽어서 인코딩 문제 해결
+    console.log('띠그림 로드 시작:', zodiacImagePath);
+    console.log('파일 실제 존재 확인:', existsSync(zodiacImagePath));
+
+    let zodiacImage;
+    try {
+      // 파일을 Buffer로 읽음 (한글 파일명 인코딩 문제 해결)
+      const imageBuffer = readFileSync(zodiacImagePath);
+      zodiacImage = await loadImage(imageBuffer);
+      console.log('띠그림 로드 완료, 크기:', zodiacImage.width, 'x', zodiacImage.height);
+    } catch (imageError) {
+      console.error('이미지 로드 상세 오류:', imageError);
+      throw new Error(`이미지 로드 실패 (${zodiacName}.png): ${imageError}`);
+    }
+
     ctx.drawImage(zodiacImage, 240, 120, 720, 720);
+    console.log('띠그림 그리기 완료');
 
-    // 텍스트 설정
-    ctx.fillStyle = '#1a1a1a';
+    // 텍스트 설정 (검은색)
+    ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
 
-    // 출생년도 그리기 (2배 크기)
-    ctx.font = 'bold 120px sans-serif';
-    ctx.fillText(`${birthYear}년생`, 600, 110);
+    // 출생년도 그리기 (2배 크기) - 붓글씨
+    ctx.font = 'bold 120px "Gungsuh", "Gungsuh Che", "HM Jingga", sans-serif';
+    try {
+      ctx.fillText(`${birthYear}`, 600, 110);
+      console.log('출생년도 텍스트 렌더링 성공:', birthYear);
+    } catch (e) {
+      console.error('출생년도 렌더링 오류:', e);
+    }
 
-    // 이름 그리기 (2배 크기)
-    ctx.font = 'bold 240px sans-serif';
-    ctx.fillText(name, 600, 920);
+    // 이름 그리기 (크기 줄임) - 붓글씨
+    ctx.font = 'bold 160px "Gungsuh", "Gungsuh Che", "HM Jingga", sans-serif';
+    try {
+      ctx.fillText(name, 600, 950);
+      console.log('이름 텍스트 렌더링 성공:', name);
+    } catch (e) {
+      console.error('이름 렌더링 오류:', e);
+    }
 
     // PNG로 변환
     const pngBuffer = canvas.toBuffer('image/png');
