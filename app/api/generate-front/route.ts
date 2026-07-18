@@ -11,15 +11,27 @@ export const maxDuration = 60;
 // 수성돋움체 글꼴 등록
 console.log('글꼴 등록 시작...');
 try {
-  const fontPath = join(process.cwd(), 'public', 'fonts', 'SuseongDotum.ttf');
-  console.log('글꼴 경로:', fontPath);
-  console.log('파일 존재 여부:', existsSync(fontPath));
+  // Vercel 환경 호환성을 위해 여러 경로 시도
+  const possiblePaths = [
+    './public/fonts/SuseongDotum.ttf',
+    '/public/fonts/SuseongDotum.ttf',
+    join(process.cwd(), 'public', 'fonts', 'SuseongDotum.ttf'),
+  ];
 
-  if (existsSync(fontPath)) {
-    registerFont(fontPath); // family 이름 지정하지 않음 (파일의 내장 이름 사용)
+  let fontPath = '';
+  for (const path of possiblePaths) {
+    if (existsSync(path)) {
+      fontPath = path;
+      console.log(`글꼴 파일 발견: ${fontPath}`);
+      break;
+    }
+  }
+
+  if (fontPath) {
+    registerFont(fontPath);
     console.log(`✅ 수성돋움체 글꼴 등록 성공: ${fontPath}`);
   } else {
-    console.log('❌ 글꼴 파일을 찾을 수 없음:', fontPath);
+    console.log('❌ 글꼴 파일을 찾을 수 없음. 시도한 경로들:', possiblePaths);
   }
 } catch (e) {
   console.log('❌ 글꼴 등록 오류:', e);
