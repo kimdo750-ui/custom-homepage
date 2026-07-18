@@ -63,8 +63,18 @@ export default function Home() {
           <button
             onClick={() => setShowDesigner('text')}
             style={{ padding: '12px 30px', background: '#2563EB', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, transition: 'all 0.2s' }}
-            onMouseOver={(e) => (e.target as HTMLButtonElement).style.background = '#1D4ED8'}
-            onMouseOut={(e) => (e.target as HTMLButtonElement).style.background = '#2563EB'}
+            onMouseOver={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = '#1D4ED8';
+              btn.style.transform = 'scale(1.05)';
+              btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseOut={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = '#2563EB';
+              btn.style.transform = 'scale(1)';
+              btn.style.boxShadow = 'none';
+            }}
           >
             디자인 시작하기
           </button>
@@ -84,8 +94,18 @@ export default function Home() {
           <button
             onClick={() => setShowDesigner('text')}
             style={{ display: 'inline-block', background: '#2563EB', color: 'white', padding: '14px 40px', borderRadius: '6px', textDecoration: 'none', fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: '14px', transition: 'all 0.2s' }}
-            onMouseOver={(e) => (e.target as HTMLButtonElement).style.background = '#1D4ED8'}
-            onMouseOut={(e) => (e.target as HTMLButtonElement).style.background = '#2563EB'}
+            onMouseOver={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = '#1D4ED8';
+              btn.style.transform = 'scale(1.05)';
+              btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseOut={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = '#2563EB';
+              btn.style.transform = 'scale(1)';
+              btn.style.boxShadow = 'none';
+            }}
           >
             지금 만들어보기 →
           </button>
@@ -165,8 +185,18 @@ export default function Home() {
                     width: '100%',
                     transition: 'all 0.2s'
                   }}
-                  onMouseOver={(e) => (e.target as HTMLButtonElement).style.background = '#1D4ED8'}
-                  onMouseOut={(e) => (e.target as HTMLButtonElement).style.background = '#2563EB'}
+                  onMouseOver={(e) => {
+                    const btn = e.target as HTMLButtonElement;
+                    btn.style.background = '#1D4ED8';
+                    btn.style.transform = 'scale(1.02)';
+                    btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseOut={(e) => {
+                    const btn = e.target as HTMLButtonElement;
+                    btn.style.background = '#2563EB';
+                    btn.style.transform = 'scale(1)';
+                    btn.style.boxShadow = 'none';
+                  }}
                 >
                   {option.title} →
                 </button>
@@ -184,8 +214,18 @@ export default function Home() {
           <button
             onClick={() => setShowDesigner('text')}
             style={{ padding: '14px 40px', background: 'white', color: '#2563EB', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, transition: 'all 0.2s' }}
-            onMouseOver={(e) => (e.target as HTMLButtonElement).style.opacity = '0.9'}
-            onMouseOut={(e) => (e.target as HTMLButtonElement).style.opacity = '1'}
+            onMouseOver={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = '#f0f0f0';
+              btn.style.transform = 'scale(1.05)';
+              btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onMouseOut={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = 'white';
+              btn.style.transform = 'scale(1)';
+              btn.style.boxShadow = 'none';
+            }}
           >
             지금 시작하기 →
           </button>
