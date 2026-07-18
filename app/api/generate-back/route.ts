@@ -7,33 +7,20 @@ const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
 export const maxDuration = 60;
 
-// 수성돋움체 글꼴 등록
-console.log('글꼴 등록 시작...');
-try {
-  // Vercel 환경 호환성을 위해 여러 경로 시도
-  const possiblePaths = [
-    './public/fonts/SuseongDotum.ttf',
-    '/public/fonts/SuseongDotum.ttf',
-    join(process.cwd(), 'public', 'fonts', 'SuseongDotum.ttf'),
-  ];
-
-  let fontPath = '';
-  for (const path of possiblePaths) {
-    if (existsSync(path)) {
-      fontPath = path;
-      console.log(`글꼴 파일 발견: ${fontPath}`);
-      break;
+// 수성돋움체 글꼴 등록 (로컬 개발 환경만)
+if (process.env.NODE_ENV === 'development') {
+  console.log('글꼴 등록 시작...');
+  try {
+    const fontPath = join(process.cwd(), 'public', 'fonts', 'SuseongDotum.ttf');
+    if (existsSync(fontPath)) {
+      registerFont(fontPath);
+      console.log(`✅ 수성돋움체 글꼴 등록 성공: ${fontPath}`);
+    } else {
+      console.log('❌ 글꼴 파일을 찾을 수 없음:', fontPath);
     }
+  } catch (e) {
+    console.log('❌ 글꼴 등록 오류:', e);
   }
-
-  if (fontPath) {
-    registerFont(fontPath);
-    console.log(`✅ 수성돋움체 글꼴 등록 성공: ${fontPath}`);
-  } else {
-    console.log('❌ 글꼴 파일을 찾을 수 없음. 시도한 경로들:', possiblePaths);
-  }
-} catch (e) {
-  console.log('❌ 글꼴 등록 오류:', e);
 }
 
 export async function POST(request: NextRequest) {
