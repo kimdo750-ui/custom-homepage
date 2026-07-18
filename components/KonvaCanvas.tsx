@@ -435,32 +435,6 @@ export default function KonvaCanvas({
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
-    // 두 손가락 제스처
-    if (e.touches.length === 2 && selectedId) {
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const distance = getDistance(touch1, touch2);
-      const angle = getAngleBetweenTouches(touch1, touch2);
-      const element = elements.find((el) => el.id === selectedId);
-
-      if (element) {
-        // 두 손가락 회전 (항상 회전)
-        setTwoFingerRotating({
-          id: selectedId,
-          startRotation: element.rotation,
-          startAngle: angle,
-        });
-        // 핀치는 동시에 처리
-        setPinching({
-          id: selectedId,
-          startDistance: distance,
-          startWidth: element.width,
-          startHeight: element.height,
-        });
-      }
-      return;
-    }
-
     // 일반 터치 (한 손가락)
     if (e.touches.length === 1) {
       const touch = e.touches[0];
@@ -471,8 +445,31 @@ export default function KonvaCanvas({
       for (let i = elements.length - 1; i >= 0; i--) {
         const element = elements[i];
         const resizeHandleSize = 45; // 모바일은 더 크게
+        const rotateHandleRadius = 45;
+        const centerX = element.x + element.width / 2;
+        const centerY = element.y + element.height / 2;
 
-        // 리사이즈 핸들 우선 확인
+        // 회전 핸들 확인 (상단 중앙)
+        const rotateHandleX = element.x + element.width / 2;
+        const rotateHandleY = element.y - rotateHandleRadius;
+        const distToRotateHandle = Math.sqrt(
+          Math.pow(x - rotateHandleX, 2) + Math.pow(y - rotateHandleY, 2)
+        );
+
+        if (distToRotateHandle <= 30) {
+          const startAngle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+          setSelectedId(element.id);
+          setRotating({
+            id: element.id,
+            startRotation: element.rotation,
+            centerX,
+            centerY,
+            startAngle,
+          });
+          return;
+        }
+
+        // 리사이즈 핸들 확인
         if (
           x >= element.x + element.width - resizeHandleSize &&
           x <= element.x + element.width + 5 &&
@@ -519,40 +516,22 @@ export default function KonvaCanvas({
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
-    // 두 손가락 제스처 (회전 + 핀치 동시)
-    if (e.touches.length === 2 && (twoFingerRotating || pinching)) {
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const currentAngle = getAngleBetweenTouches(touch1, touch2);
-      const distance = getDistance(touch1, touch2);
-      const id = twoFingerRotating?.id || pinching?.id;
-
-      if (onUpdateElement && id) {
-        const updates: any = {};
-
-        // 회전 처리
-        if (twoFingerRotating) {
-          const deltaAngle = currentAngle - twoFingerRotating.startAngle;
-          updates.rotation = (twoFingerRotating.startRotation + deltaAngle) % 360;
-        }
-
-        // 크기 조절 처리
-        if (pinching) {
-          const scale = distance / pinching.startDistance;
-          updates.width = Math.max(50, pinching.startWidth * scale);
-          updates.height = Math.max(50, pinching.startHeight * scale);
-        }
-
-        onUpdateElement(id, updates);
-      }
-      return;
-    }
-
-    // 일반 터치 드래그/리사이즈
+    // 일반 터치 드래그/리사이즈/회전
     if (e.touches.length === 1) {
       const touch = e.touches[0];
       const x = (touch.clientX - rect.left) * scaleX;
       const y = (touch.clientY - rect.top) * scaleY;
+
+      if (rotating && onUpdateElement) {
+        const currentAngle = Math.atan2(y - rotating.centerY, x - rotating.centerX) * (180 / Math.PI);
+        const deltaAngle = currentAngle - rotating.startAngle;
+        const newRotation = rotating.startRotation + deltaAngle;
+
+        onUpdateElement(rotating.id, {
+          rotation: newRotation % 360,
+        });
+        return;
+      }
 
       if (resizing && onUpdateElement) {
         const deltaX = x - resizing.startX;
