@@ -596,8 +596,8 @@ export default function KonvaCanvas({
           <div className="block sm:hidden">
             <p>📱 터치로 선택</p>
             <p>👆 드래그: 위치 이동</p>
+            <p>🔄 상단 원형 핸들: 회전</p>
             <p>👌 두 손가락 핀치: 크기 조절</p>
-            <p>🔄 두 손가락 회전 (Alt+두 손가락): 회전</p>
           </div>
           {/* 데스크톱 */}
           <div className="hidden sm:block">
