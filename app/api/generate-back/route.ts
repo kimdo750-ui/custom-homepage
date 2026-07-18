@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
     ctx.globalAlpha = 1;
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';  // 중앙 정렬
 
     // 텍스트 길이에 따라 폰트 크기 조정
     let fontSize = 260;
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
     ctx.font = `bold ${fontSize}px serif`;
 
     try {
-      ctx.fillText(text.substring(0, 20), 600, 570);
+      ctx.fillText(text.substring(0, 20), 600, 480);  // 중앙에 표시
       console.log('텍스트 렌더링 성공:', text);
     } catch (textError) {
       console.error('텍스트 렌더링 오류:', textError);
