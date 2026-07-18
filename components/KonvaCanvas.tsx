@@ -544,7 +544,6 @@ export default function KonvaCanvas({
         }
 
         onUpdateElement(id, updates);
-        });
       }
       return;
     }
