@@ -62,11 +62,11 @@ export async function POST(request: NextRequest) {
       fontSize = 230;
     }
 
-    // 기본 serif 글꼴 (프로덕션 호환)
-    ctx.font = `bold ${fontSize}px serif`;
+    // 텍스트 렌더링 (글꼴 매칭 - 여러 옵션 제공)
+    ctx.font = `bold ${fontSize}px "Arial", "Helvetica", "Times New Roman", sans-serif`;
 
     try {
-      ctx.fillText(text.substring(0, 20), 600, 420);  // 위로 조정해서 겹침 해결
+      ctx.fillText(text.substring(0, 20), 600, 420);
       console.log('텍스트 렌더링 성공:', text);
     } catch (textError) {
       console.error('텍스트 렌더링 오류:', textError);
