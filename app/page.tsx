@@ -75,6 +75,18 @@ export default function Home() {
               btn.style.transform = 'scale(1)';
               btn.style.boxShadow = 'none';
             }}
+            onTouchStart={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = '#1D4ED8';
+              btn.style.transform = 'scale(1.05)';
+              btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onTouchEnd={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = '#2563EB';
+              btn.style.transform = 'scale(1)';
+              btn.style.boxShadow = 'none';
+            }}
           >
             디자인 시작하기
           </button>
@@ -101,6 +113,18 @@ export default function Home() {
               btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
             }}
             onMouseOut={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = '#2563EB';
+              btn.style.transform = 'scale(1)';
+              btn.style.boxShadow = 'none';
+            }}
+            onTouchStart={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = '#1D4ED8';
+              btn.style.transform = 'scale(1.05)';
+              btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onTouchEnd={(e) => {
               const btn = e.target as HTMLButtonElement;
               btn.style.background = '#2563EB';
               btn.style.transform = 'scale(1)';
@@ -197,6 +221,18 @@ export default function Home() {
                     btn.style.transform = 'scale(1)';
                     btn.style.boxShadow = 'none';
                   }}
+                  onTouchStart={(e) => {
+                    const btn = e.target as HTMLButtonElement;
+                    btn.style.background = '#1D4ED8';
+                    btn.style.transform = 'scale(1.02)';
+                    btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  }}
+                  onTouchEnd={(e) => {
+                    const btn = e.target as HTMLButtonElement;
+                    btn.style.background = '#2563EB';
+                    btn.style.transform = 'scale(1)';
+                    btn.style.boxShadow = 'none';
+                  }}
                 >
                   {option.title} →
                 </button>
@@ -221,6 +257,18 @@ export default function Home() {
               btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
             }}
             onMouseOut={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = 'white';
+              btn.style.transform = 'scale(1)';
+              btn.style.boxShadow = 'none';
+            }}
+            onTouchStart={(e) => {
+              const btn = e.target as HTMLButtonElement;
+              btn.style.background = '#f0f0f0';
+              btn.style.transform = 'scale(1.05)';
+              btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+            onTouchEnd={(e) => {
               const btn = e.target as HTMLButtonElement;
               btn.style.background = 'white';
               btn.style.transform = 'scale(1)';
