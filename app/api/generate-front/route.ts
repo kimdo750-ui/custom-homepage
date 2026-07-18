@@ -8,32 +8,21 @@ const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
 export const maxDuration = 60;
 
-// 붓글씨 글꼴 등록 시도
+// 수성돋움체 글꼴 등록
+console.log('글꼴 등록 시작...');
 try {
-  // Windows 시스템 글꼴 경로 (붓글씨 글자체)
-  const fontPaths = [
-    'C:\\Windows\\Fonts\\gungsuh.ttf',     // 궁서
-    'C:\\Windows\\Fonts\\gungsuhcje.ttf',  // 궁서체
-    'C:\\Windows\\Fonts\\hmjingga.ttf',    // 함초롱 고딕
-  ];
+  const fontPath = join(process.cwd(), 'public', 'fonts', 'SuseongDotum.ttf');
+  console.log('글꼴 경로:', fontPath);
+  console.log('파일 존재 여부:', existsSync(fontPath));
 
-  for (const fontPath of fontPaths) {
-    if (existsSync(fontPath)) {
-      let fontName = 'Gungsuh';
-      if (fontPath.includes('gungsuhcje')) fontName = 'Gungsuh Che';
-      if (fontPath.includes('hmjingga')) fontName = 'HM Jingga';
-
-      try {
-        registerFont(fontPath, { family: fontName });
-        console.log(`붓글씨 글꼴 등록 성공: ${fontName} - ${fontPath}`);
-        break;
-      } catch (e) {
-        console.log(`글꼴 등록 실패: ${fontPath}`);
-      }
-    }
+  if (existsSync(fontPath)) {
+    registerFont(fontPath); // family 이름 지정하지 않음 (파일의 내장 이름 사용)
+    console.log(`✅ 수성돋움체 글꼴 등록 성공: ${fontPath}`);
+  } else {
+    console.log('❌ 글꼴 파일을 찾을 수 없음:', fontPath);
   }
 } catch (e) {
-  console.log('글꼴 등록 오류:', e);
+  console.log('❌ 글꼴 등록 오류:', e);
 }
 
 export async function POST(request: NextRequest) {
@@ -107,8 +96,8 @@ export async function POST(request: NextRequest) {
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
 
-    // 출생년도 그리기 (기본 시스템 글꼴)
-    ctx.font = 'bold 120px serif';
+    // 출생년도 그리기 (수성돋움체)
+    ctx.font = 'bold 120px "Suseong Dotum"';
     try {
       ctx.fillText(`${birthYear}`, 600, 110);
       console.log('출생년도 텍스트 렌더링 성공:', birthYear);
@@ -116,8 +105,8 @@ export async function POST(request: NextRequest) {
       console.error('출생년도 렌더링 오류:', e);
     }
 
-    // 이름 그리기 (기본 시스템 글꼴)
-    ctx.font = 'bold 160px serif';
+    // 이름 그리기 (수성돋움체)
+    ctx.font = 'bold 160px "Suseong Dotum"';
     try {
       ctx.fillText(name, 600, 950);
       console.log('이름 텍스트 렌더링 성공:', name);
