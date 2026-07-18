@@ -8,20 +8,18 @@ const REMOVEBG_API_KEY = process.env.REMOVEBG_API_KEY;
 
 export const maxDuration = 60;
 
-// 수성돋움체 글꼴 등록 (로컬 개발 환경만)
-if (process.env.NODE_ENV === 'development') {
-  console.log('글꼴 등록 시작...');
-  try {
-    const fontPath = join(process.cwd(), 'public', 'fonts', 'SuseongDotum.ttf');
-    if (existsSync(fontPath)) {
-      registerFont(fontPath);
-      console.log(`✅ 수성돋움체 글꼴 등록 성공: ${fontPath}`);
-    } else {
-      console.log('❌ 글꼴 파일을 찾을 수 없음:', fontPath);
-    }
-  } catch (e) {
-    console.log('❌ 글꼴 등록 오류:', e);
+// 수성돋움체 글꼴 등록 (모든 환경)
+console.log('글꼴 등록 시작...');
+try {
+  const fontPath = join(process.cwd(), 'public', 'fonts', 'SuseongDotum.ttf');
+  if (existsSync(fontPath)) {
+    registerFont(fontPath, { family: 'SuseongDotum' });
+    console.log(`✅ 수성돋움체 글꼴 등록 성공: ${fontPath}`);
+  } else {
+    console.log('❌ 글꼴 파일을 찾을 수 없음:', fontPath);
   }
+} catch (e) {
+  console.log('❌ 글꼴 등록 오류:', e);
 }
 
 export async function POST(request: NextRequest) {
@@ -96,7 +94,7 @@ export async function POST(request: NextRequest) {
     ctx.textAlign = 'center';
 
     // 출생년도 그리기
-    ctx.font = '120px';
+    ctx.font = 'bold 120px SuseongDotum';
     try {
       ctx.fillText(`${birthYear}`, 600, 110);
       console.log('출생년도 텍스트 렌더링 성공:', birthYear);
@@ -104,8 +102,8 @@ export async function POST(request: NextRequest) {
       console.error('출생년도 렌더링 오류:', e);
     }
 
-    // 이름 그리기 (모든 시스템에서 지원하는 기본 글꼴)
-    ctx.font = 'bold 160px serif';
+    // 이름 그리기
+    ctx.font = 'bold 160px SuseongDotum';
     try {
       ctx.fillText(name, 600, 950);
       console.log('이름 텍스트 렌더링 성공:', name);
