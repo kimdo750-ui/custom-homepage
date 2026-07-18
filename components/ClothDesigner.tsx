@@ -143,10 +143,10 @@ export default function ClothDesigner() {
   const backElements = elements.filter((el) => el.position === 'back');
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 p-4 lg:p-0">
+    <div className="max-w-7xl mx-auto px-3 lg:px-0">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-8">
         {/* 왼쪽 패널 */}
-        <div className="lg:col-span-1 order-2 lg:order-1">
+        <div className="lg:col-span-1 order-1">
         {/* 문구 디자인 */}
         <DesignPanel
           clothColor={clothColor}
@@ -239,7 +239,7 @@ export default function ClothDesigner() {
       </div>
 
         {/* 앞면 캔버스 */}
-        <div className="lg:col-span-2 order-1 lg:order-2">
+        <div className="lg:col-span-2 order-2">
         <div className="bg-white rounded-lg shadow-lg p-3 lg:p-4">
           <h2 className="text-base lg:text-lg font-bold mb-3">👤 앞면</h2>
           <KonvaCanvas
@@ -258,7 +258,7 @@ export default function ClothDesigner() {
       </div>
 
         {/* 뒷면 캔버스 */}
-        <div className="lg:col-span-2 order-3 lg:order-3">
+        <div className="lg:col-span-2 order-3">
         <div className="bg-white rounded-lg shadow-lg p-3 lg:p-4">
           <h2 className="text-base lg:text-lg font-bold mb-3">⭐ 뒷면</h2>
           <KonvaCanvas
