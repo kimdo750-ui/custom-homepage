@@ -9,11 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.113.0",
     "@fontsource/noto-sans-kr": "^5.2.9",
     "@fontsource/noto-serif-kr": "^5.2.9",
     "@google/genai": "^2.10.0",
     "@imgly/background-removal": "^1.7.0",
     "canvas": "^3.2.3",
+    "dotenv": "^17.4.2",
     "html2canvas": "^1.4.1",
     "konva": "^9.2.0",
     "mongodb": "^7.5.0",
@@ -23,7 +25,8 @@
     "react-dom": "19.2.4",
     "react-konva": "^18.2.10",
     "remove-background": "^0.1.0-beta.1",
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.3",
+    "telegraf": "^4.16.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
