@@ -19,32 +19,8 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
     // 대화 히스토리 가져오기
     const conversationHistory = getConversationHistory(userId, 8);
 
-    let assistantMessage = '';
-
-    try {
-      // Claude에 마케팅 조언 요청
-      const fullPrompt = generateMarketingPrompt(userMessage, conversationHistory);
-
-      const response = await client.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1500,
-        messages: [
-          {
-            role: 'user',
-            content: fullPrompt,
-          },
-        ],
-      });
-
-      assistantMessage =
-        response.content[0].type === 'text'
-          ? response.content[0].text
-          : getDefaultResponse(userMessage);
-    } catch (apiError) {
-      console.error('⚠️  Claude API 오류, 기본 응답 사용:', apiError);
-      // API 오류 시 미리 준비된 응답 사용
-      assistantMessage = getDefaultResponse(userMessage);
-    }
+    // 템플릿 기반 응답 (API 호출 없음)
+    const assistantMessage = getDefaultResponse(userMessage);
 
     // AI 응답 저장
     addMessage(userId, 'assistant', assistantMessage);
