@@ -157,16 +157,29 @@ function getDefaultResponse(userMessage: string): string {
 - SNS로 자유로운 홍보"`;
   }
 
-  return `🎨 한올 러그 마케팅 어시스턴트
+  // 기본 응답: 모든 질문에 대해 마케팅 조언 제공
+  return `📌 한올 러그 마케팅 전략
 
-뭐든 물어봐주세요!
+"${userMessage}"에 대한 조언:
+
+🎯 현재 상황:
+- 타겟: 30-50대 여성 + MZ세대
+- 포지셔닝: "한국 전통의 미가 숨쉬는 프리미엄 러그"
+- 핵심: 작가 협력 + 스토리텔링
+
+💡 추천:
+1️⃣ Instagram에서 Before/After 콘텐츠로 시작
+2️⃣ 작가 협력으로 입소문 유도 (5% 로열티)
+3️⃣ 블로그 SEO로 검색 유입 확보
+4️⃣ 전통 문양 스토리로 차별화
+
+📞 더 구체적인 조언이 필요하면:
 - "오늘 뭐 해야 할까?"
 - "인스타그램 전략"
 - "블로그 포스트"
 - "작가 협력"
-- "카드뉴스 디자인"
 
-구체적인 조언을 해드립니다! 💪`;
+이렇게 물어봐주세요! 💪`;
 }
 
 function analyzeUserIntent(userId: number, message: string) {
