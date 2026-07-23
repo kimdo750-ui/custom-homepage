@@ -157,6 +157,28 @@ function getDefaultResponse(userMessage: string): string {
 - SNS로 자유로운 홍보"`;
   }
 
+  if (lower.includes('카드') || lower.includes('디자인')) {
+    return `🎨 카드뉴스 & 디자인 전략
+
+📌 카드뉴스 주제 (주 1회):
+1️⃣ "한국 전통 문양의 의미"
+2️⃣ "러그 선택 팁 5가지"
+3️⃣ "프리미엄 러그 가치"
+4️⃣ "작가 협력 이야기"
+5️⃣ "계절별 러그 추천"
+
+🎯 디자인 방향:
+- 색상: 따뜻한 톤 (베이지, 갈색, burgundy)
+- 타입: 심플하고 고급스러운 느낌
+- 폰트: 한글 고딕 + 영문 serif
+- 레이아웃: 텍스트 40% + 이미지 60%
+
+💡 배포 채널:
+- Instagram 피드 (1회/주)
+- Instagram Stories (2-3회/주)
+- Threads (일일)`;
+  }
+
   // 기본 응답: 모든 질문에 대해 마케팅 조언 제공
   return `📌 한올 러그 마케팅 전략
 
