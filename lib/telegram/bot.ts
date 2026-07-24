@@ -404,7 +404,7 @@ export function saveGeneratedCardNews(
 
   console.log(`💾 카드뉴스 저장: ${title} (${cardsCount}장)`);
 
-  // DB에도 저장 (비동기, 에러 무시)
+  // DB에도 저장 (동기 처리)
   saveConversationLog({
     userId,
     role: 'system',
@@ -417,7 +417,11 @@ export function saveGeneratedCardNews(
     }),
     timestamp: new Date(),
     focusArea: 'card-news',
-  }).catch((err) => console.warn('⚠️ 카드뉴스 DB 저장 실패:', err));
+  }).then(() => {
+    console.log(`✅ 카드뉴스 DB 저장 완료: ${title}`);
+  }).catch((err) => {
+    console.warn('⚠️ 카드뉴스 DB 저장 실패:', err);
+  });
 }
 
 export function getGeneratedCardNews(userId: number): any[] {
