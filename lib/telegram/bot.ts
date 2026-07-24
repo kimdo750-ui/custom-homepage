@@ -7,6 +7,7 @@ import {
   addContextNote,
 } from './memory';
 import { saveConversationLog, upsertUserProfile } from '@/lib/db/connection';
+import { parseAIResponse } from '@/lib/card-news/generator';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -58,6 +59,11 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
 
     // 사용자 메시지 분석 (마케팅 단계 추적)
     analyzeUserIntent(userId, userMessage);
+
+    // 🎨 카드뉴스 자동 생성 (백그라운드)
+    generateCardNewsAsync(assistantMessage, userId).catch((err) => {
+      console.warn('⚠️ 카드뉴스 생성 실패 (백그라운드):', err);
+    });
 
     return assistantMessage;
   } catch (error) {
@@ -293,4 +299,80 @@ export async function isValidBotToken(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+// 🎨 카드뉴스 자동 생성 (백그라운드)
+async function generateCardNewsAsync(aiResponse: string, userId: number): Promise<void> {
+  try {
+    console.log(`🎨 카드뉴스 생성 시작: userId=${userId}`);
+
+    // AI 응답에서 카드뉴스 구조 파싱
+    const deck = parseAIResponse(aiResponse);
+
+    if (!deck.cards || deck.cards.length === 0) {
+      console.warn('⚠️ 카드뉴스 생성 실패: 카드가 없음');
+      return;
+    }
+
+    // 사용자 컨텍스트에 카드뉴스 저장
+    const userContext = getOrCreateUserContext(userId);
+    addContextNote(
+      userId,
+      `📸 카드뉴스 생성 완료: ${deck.cards.length}장 덱 생성`
+    );
+
+    console.log(`✅ 카드뉴스 생성 완료: ${deck.cards.length}장`);
+
+    // 선택적: 카드뉴스 통계 저장
+    await saveConversationLog({
+      userId,
+      role: 'system',
+      content: `카드뉴스 생성: ${deck.cards.length}장 덱`,
+      timestamp: new Date(),
+      focusArea: 'card-news-generation',
+    }).catch((err) => console.warn('⚠️ 카드뉴스 로그 저장 실패:', err));
+  } catch (error) {
+    console.error('❌ 카드뉴스 생성 중 오류:', error);
+  }
+}
+
+// 사용자별 생성된 카드뉴스 저장소 (메모리 기반)
+const cardNewsStorage = new Map<
+  number,
+  {
+    timestamp: number;
+    title: string;
+    cardsCount: number;
+    link: string;
+  }[]
+>();
+
+export function saveGeneratedCardNews(
+  userId: number,
+  title: string,
+  cardsCount: number,
+  link: string
+): void {
+  if (!cardNewsStorage.has(userId)) {
+    cardNewsStorage.set(userId, []);
+  }
+
+  cardNewsStorage.get(userId)!.push({
+    timestamp: Date.now(),
+    title,
+    cardsCount,
+    link,
+  });
+
+  // 최대 10개만 유지
+  const history = cardNewsStorage.get(userId)!;
+  if (history.length > 10) {
+    history.shift();
+  }
+
+  console.log(`💾 카드뉴스 저장: ${title} (${cardsCount}장)`);
+}
+
+export function getGeneratedCardNews(userId: number): any[] {
+  return cardNewsStorage.get(userId) || [];
 }
