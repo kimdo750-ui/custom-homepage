@@ -321,13 +321,23 @@ async function generateCardNewsAsync(aiResponse: string, userId: number): Promis
       `📸 카드뉴스 생성 완료: ${deck.cards.length}장 덱 생성`
     );
 
-    console.log(`✅ 카드뉴스 생성 완료: ${deck.cards.length}장`);
+    // 🚀 카드뉴스를 저장소에 저장 (대시보드에서 조회 가능하게)
+    const jobId = `card-${Date.now()}`;
+    const title = deck.title || `마케팅 카드뉴스 - ${new Date().toLocaleString('ko-KR')}`;
+    saveGeneratedCardNews(
+      userId,
+      title,
+      deck.cards.length,
+      `/api/card-news/export?jobId=${jobId}&format=zip`
+    );
+
+    console.log(`✅ 카드뉴스 생성 완료: ${deck.cards.length}장 (저장됨)`);
 
     // 선택적: 카드뉴스 통계 저장
     await saveConversationLog({
       userId,
       role: 'system',
-      content: `카드뉴스 생성: ${deck.cards.length}장 덱`,
+      content: `카드뉴스 생성: ${deck.cards.length}장 덱 (jobId: ${jobId})`,
       timestamp: new Date(),
       focusArea: 'card-news-generation',
     }).catch((err) => console.warn('⚠️ 카드뉴스 로그 저장 실패:', err));
