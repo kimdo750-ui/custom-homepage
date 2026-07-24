@@ -89,6 +89,40 @@ async function getUpdates() {
 
 async function sendMessage(chatId: number, text: string): Promise<boolean> {
   try {
+    const MAX_LENGTH = 4096;
+
+    // 텍스트가 길면 여러 메시지로 나누기
+    if (text.length > MAX_LENGTH) {
+      const messages = [];
+      let currentMessage = '';
+
+      for (const char of text) {
+        if ((currentMessage + char).length > MAX_LENGTH) {
+          messages.push(currentMessage);
+          currentMessage = char;
+        } else {
+          currentMessage += char;
+        }
+      }
+      if (currentMessage) messages.push(currentMessage);
+
+      console.log(`📤 ${messages.length}개 메시지로 나누어 전송`);
+
+      for (const msg of messages) {
+        await sendSingleMessage(chatId, msg);
+      }
+      return true;
+    }
+
+    return await sendSingleMessage(chatId, text);
+  } catch (error) {
+    console.error('❌ sendMessage 실패:', error);
+    return false;
+  }
+}
+
+async function sendSingleMessage(chatId: number, text: string): Promise<boolean> {
+  try {
     const url = `${TELEGRAM_API_URL}${BOT_TOKEN}/sendMessage`;
 
     const response = await fetch(url, {
