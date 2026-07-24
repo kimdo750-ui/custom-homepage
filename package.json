@@ -24,6 +24,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-konva": "^18.2.10",
+    "recharts": "^3.10.0",
     "remove-background": "^0.1.0-beta.1",
     "sharp": "^0.35.3",
     "telegraf": "^4.16.3"
