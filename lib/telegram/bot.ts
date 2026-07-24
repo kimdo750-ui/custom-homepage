@@ -6,6 +6,7 @@ import {
   getOrCreateUserContext,
   addContextNote,
 } from './memory';
+import { saveConversationLog, upsertUserProfile } from '@/lib/db/connection';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -13,8 +14,16 @@ const client = new Anthropic({
 
 export async function handleUserMessage(userId: number, userMessage: string): Promise<string> {
   try {
-    // 사용자 메시지 저장
+    // 메모리에 저장
     addMessage(userId, 'user', userMessage);
+
+    // DB에 사용자 메시지 저장 (비동기)
+    saveConversationLog({
+      userId,
+      role: 'user',
+      content: userMessage,
+      timestamp: new Date(),
+    }).catch((err) => console.error('⚠️ 사용자 메시지 DB 저장 실패:', err));
 
     // 대화 히스토리 가져오기
     const conversationHistory = getConversationHistory(userId, 8);
@@ -22,8 +31,30 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
     // AI 응답 생성
     const assistantMessage = await generateAIResponse(userMessage, conversationHistory);
 
-    // AI 응답 저장
+    // 메모리에 저장
     addMessage(userId, 'assistant', assistantMessage);
+
+    // DB에 AI 응답 저장 (비동기)
+    const userContext = getOrCreateUserContext(userId);
+    saveConversationLog({
+      userId,
+      role: 'assistant',
+      content: assistantMessage,
+      timestamp: new Date(),
+      marketingStage: userContext.context.marketingStage,
+      focusArea: userContext.context.focusArea,
+    }).catch((err) => console.error('⚠️ AI 응답 DB 저장 실패:', err));
+
+    // 사용자 프로필 업데이트 (비동기)
+    upsertUserProfile({
+      userId,
+      createdAt: new Date(),
+      lastActivity: new Date(),
+      totalMessages: userContext.messages.length,
+      currentStage: userContext.context.marketingStage,
+      focusAreas: userContext.context.focusArea ? [userContext.context.focusArea] : [],
+      tags: [],
+    }).catch((err) => console.error('⚠️ 사용자 프로필 업데이트 실패:', err));
 
     // 사용자 메시지 분석 (마케팅 단계 추적)
     analyzeUserIntent(userId, userMessage);
