@@ -39,6 +39,36 @@ const CHART_COLORS = ['#0066ff', '#7c3aed', '#059669'];
 export default function DashboardPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [botStatus, setBotStatus] = useState<any>(null);
+  const [startingBot, setStartingBot] = useState(false);
+
+  const startBot = async () => {
+    setStartingBot(true);
+    try {
+      const response = await fetch('/api/telegram/start');
+      const data = await response.json();
+      if (response.ok) {
+        alert('✅ 봇이 시작되었습니다!');
+        // 봇 상태 업데이트
+        checkBotStatus();
+      }
+    } catch (error) {
+      console.error('봇 시작 실패:', error);
+      alert('봇 시작에 실패했습니다');
+    } finally {
+      setStartingBot(false);
+    }
+  };
+
+  const checkBotStatus = async () => {
+    try {
+      const response = await fetch('/api/telegram/status');
+      const data = await response.json();
+      setBotStatus(data);
+    } catch (error) {
+      console.error('봇 상태 확인 실패:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -54,7 +84,11 @@ export default function DashboardPage() {
     };
 
     fetchAnalytics();
-    const interval = setInterval(fetchAnalytics, 30000);
+    checkBotStatus(); // 초기 봇 상태 확인
+    const interval = setInterval(() => {
+      fetchAnalytics();
+      checkBotStatus();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -134,14 +168,24 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* AI 상태 */}
+          {/* 봇 상태 */}
           <div className="group">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl p-6 hover:from-blue-100 hover:to-blue-100 transition-colors duration-300">
-              <p className="text-xs font-medium text-gray-600 mb-3">AI 상태</p>
-              <p className="text-3xl font-semibold text-blue-900 mb-2">
-                {analytics && analytics.totalMessages > 0 ? '학습 중' : '준비'}
+            <div className={`rounded-2xl p-6 transition-colors duration-300 ${
+              botStatus?.status === 'running'
+                ? 'bg-gradient-to-br from-green-50 to-green-100/50 hover:from-green-100 hover:to-green-100'
+                : 'bg-gradient-to-br from-yellow-50 to-yellow-100/50 hover:from-yellow-100 hover:to-yellow-100'
+            }`}>
+              <p className="text-xs font-medium text-gray-600 mb-3">봇 상태</p>
+              <p className="text-3xl font-semibold mb-2">
+                {botStatus?.status === 'running' ? '🟢 실행' : '🔴 정지'}
               </p>
-              <p className="text-xs text-gray-600">실시간 진화</p>
+              <button
+                onClick={startBot}
+                disabled={startingBot || botStatus?.status === 'running'}
+                className="mt-3 w-full py-2 px-3 bg-white hover:bg-gray-50 text-gray-700 font-medium text-xs rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {startingBot ? '시작 중...' : botStatus?.status === 'running' ? '실행 중' : '시작'}
+              </button>
             </div>
           </div>
         </div>
