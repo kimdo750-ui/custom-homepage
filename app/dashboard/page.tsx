@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import {
   BarChart,
   Bar,
@@ -232,6 +232,15 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* 카드뉴스 섹션 */}
+        <div className="mb-16">
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-black">📸 생성된 카드뉴스</h2>
+            <p className="text-xs text-gray-500 mt-1">최근 생성된 마케팅 콘텐츠</p>
+          </div>
+          <CardNewsGallery />
+        </div>
+
         {/* AI 성장 정보 */}
         <div className="bg-gray-50 rounded-2xl p-8 hover:bg-gray-100/50 transition-colors duration-300">
           <h2 className="text-lg font-semibold text-black mb-6">AI 성장</h2>
@@ -266,6 +275,99 @@ export default function DashboardPage() {
           <p className="text-xs text-gray-400 mt-2">30초마다 실시간 업데이트</p>
         </div>
       </div>
+    </div>
+  );
+}
+
+// 카드뉴스 갤러리 컴포넌트
+function CardNewsGallery() {
+  const [cardNews, setCardNews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState<string | null>(null);
+
+  useEffect(() => {
+    // 실제로는 /api/card-news/history에서 사용자의 카드뉴스 히스토리를 로드
+    // 현재는 모의 데이터
+    setLoading(false);
+  }, []);
+
+  const downloadCardNews = async (jobId: string) => {
+    setDownloading(jobId);
+    try {
+      const response = await fetch(`/api/card-news/export?jobId=${jobId}&format=zip`);
+      if (!response.ok) throw new Error('다운로드 실패');
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'card-news.zip';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('❌ 다운로드 실패:', error);
+      alert('다운로드에 실패했습니다');
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  return (
+    <div className="bg-gray-50 rounded-2xl p-8 hover:bg-gray-100/50 transition-colors duration-300">
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="w-8 h-8 border-2 border-gray-300 border-t-black rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-sm text-gray-600">카드뉴스 로드 중...</p>
+          </div>
+        </div>
+      ) : cardNews.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-sm text-gray-600">🎨 아직 생성된 카드뉴스가 없습니다</p>
+            <p className="text-xs text-gray-500 mt-2">텔레그램 봇에서 질문하면 자동으로 생성됩니다</p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cardNews.map((item) => (
+            <div
+              key={item.id}
+              className="group bg-white rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300"
+            >
+              {/* 카드 미리보기 */}
+              <div className="relative bg-gray-100 aspect-[9/11.25] overflow-hidden">
+                {item.preview ? (
+                  <img
+                    src={item.preview}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <p className="text-gray-400 text-sm">미리보기 없음</p>
+                  </div>
+                )}
+              </div>
+
+              {/* 카드 정보 */}
+              <div className="p-4">
+                <p className="text-sm font-semibold text-black truncate">{item.title}</p>
+                <p className="text-xs text-gray-500 mt-1">{item.cardsCount}개 이미지</p>
+
+                {/* 다운로드 버튼 */}
+                <button
+                  onClick={() => downloadCardNews(item.jobId)}
+                  disabled={downloading === item.jobId}
+                  className="w-full mt-4 py-2 px-3 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-sm rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {downloading === item.jobId ? '다운로드 중...' : '📥 다운로드'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

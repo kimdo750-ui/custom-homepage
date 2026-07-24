@@ -1,37 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
+import JSZip from 'jszip';
 
-// 사용자별 생성된 카드뉴스 내보내기
-// 사용자 ID와 카드뉴스 ID로 ZIP 또는 이미지 반환
+// 메모리 기반 카드뉴스 저장소
+interface StoredCardNews {
+  id: string;
+  userId: number;
+  title: string;
+  images: Blob[];
+  timestamp: number;
+  expiresAt: number; // 1시간 후 삭제
+}
+
+const cardNewsStore = new Map<string, StoredCardNews>();
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    const format = searchParams.get('format') || 'zip'; // zip | images | preview
+    const jobId = searchParams.get('jobId');
+    const format = searchParams.get('format') || 'zip';
 
-    if (!userId) {
+    if (!jobId) {
       return NextResponse.json(
-        { error: '사용자 ID가 필요합니다' },
+        { error: 'jobId가 필요합니다' },
         { status: 400 }
       );
     }
 
-    console.log(`📸 카드뉴스 내보내기: userId=${userId}, format=${format}`);
+    const stored = cardNewsStore.get(jobId);
 
-    // 현재는 생성 상태만 반환
-    // 실제 구현: 생성된 이미지 ZIP 제공
-    return NextResponse.json({
-      status: 'generating',
-      message: '카드뉴스가 준비 중입니다',
-      userId,
-      format,
-      estimatedTime: '2-3분',
-      downloadUrl: `/api/card-news/download?userId=${userId}`,
+    if (!stored) {
+      return NextResponse.json(
+        { status: 'processing', message: '카드뉴스 생성 중...' },
+        { status: 202 }
+      );
+    }
+
+    console.log(`📸 카드뉴스 조회: jobId=${jobId}, format=${format}`);
+
+    if (format === 'zip') {
+      // ZIP으로 모든 이미지 번들링
+      const zip = new JSZip();
+      stored.images.forEach((blob, idx) => {
+        zip.file(`card-${String(idx + 1).padStart(2, '0')}.png`, blob);
+      });
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      return new NextResponse(zipBlob, {
+        headers: {
+          'Content-Type': 'application/zip',
+          'Content-Disposition': `attachment; filename="${stored.title}.zip"`,
+        },
+      });
+    }
+
+    // preview: 첫 번째 이미지만 반환
+    return new NextResponse(stored.images[0], {
+      headers: {
+        'Content-Type': 'image/png',
+        'Content-Disposition': `inline; filename="preview.png"`,
+      },
     });
   } catch (error) {
-    console.error('❌ 카드뉴스 내보내기 실패:', error);
+    console.error('❌ 카드뉴스 다운로드 실패:', error);
     return NextResponse.json(
-      { error: '카드뉴스 내보내기 실패' },
+      { error: '카드뉴스 다운로드 실패' },
       { status: 500 }
     );
   }
@@ -40,25 +72,55 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, cards, title } = body;
+    const { userId, images, title } = body;
 
-    if (!userId || !cards) {
+    if (!userId || !Array.isArray(images) || images.length === 0) {
       return NextResponse.json(
-        { error: '필수 파라미터 부족' },
+        { error: '필수 파라미터 부족: userId, images 필요' },
         { status: 400 }
       );
     }
 
-    console.log(`🎨 카드뉴스 생성 요청: ${title} (${cards.length}장)`);
+    const jobId = `card-${Date.now()}`;
+    const expiresAt = Date.now() + 3600000; // 1시간 후 만료
 
-    // 카드뉴스 생성 시작 (백그라운드)
-    // 실제 구현: html2canvas로 PNG 생성, JSZip으로 묶기
+    // 이미지 Blob으로 변환
+    const imageBlobs = await Promise.all(
+      images.map((imgData: string) => {
+        // Base64 또는 data URL로 받은 이미지를 Blob으로 변환
+        if (typeof imgData === 'string') {
+          const dataUrl = imgData.startsWith('data:') ? imgData : `data:image/png;base64,${imgData}`;
+          return fetch(dataUrl).then((r) => r.blob());
+        }
+        return Promise.resolve(imgData);
+      })
+    );
+
+    cardNewsStore.set(jobId, {
+      id: jobId,
+      userId,
+      title: title || `카드뉴스-${new Date().toLocaleString('ko-KR')}`,
+      images: imageBlobs,
+      timestamp: Date.now(),
+      expiresAt,
+    });
+
+    console.log(`🎨 카드뉴스 저장: ${jobId} (${imageBlobs.length}장)`);
+
+    // 만료된 항목 정리
+    for (const [key, value] of cardNewsStore.entries()) {
+      if (value.expiresAt < Date.now()) {
+        cardNewsStore.delete(key);
+      }
+    }
 
     return NextResponse.json({
-      status: 'queued',
-      message: '카드뉴스 생성이 시작되었습니다',
-      jobId: `card-${Date.now()}`,
-      estimatedTime: '2-3분',
+      status: 'success',
+      jobId,
+      message: '카드뉴스 생성 완료',
+      downloadUrl: `/api/card-news/export?jobId=${jobId}&format=zip`,
+      previewUrl: `/api/card-news/export?jobId=${jobId}&format=preview`,
+      cardsCount: imageBlobs.length,
     });
   } catch (error) {
     console.error('❌ 카드뉴스 생성 실패:', error);
