@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserConversationHistory } from '@/lib/db/connection';
-import { createCanvas } from 'canvas';
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,62 +34,19 @@ export async function GET(request: NextRequest) {
       .map((log) => {
         try {
           const content = JSON.parse(log.content || '{}');
-          // 카드뉴스 기본 정보 추출
           const timestamp = content.timestamp || Date.now();
-          const title = content.title || log.content?.substring(0, 20) || '마케팅 카드뉴스';
+          const title = content.title || '마케팅 카드뉴스';
           const cardsCount = content.cardsCount || 5;
 
-          // 간단한 PNG 이미지 생성 (1x1 흰 픽셀로 시작)
-          // canvas 사용 불가능 시 fallback
-          let preview = '';
-          try {
-            const canvas = createCanvas(600, 750);
-            const ctx = canvas.getContext('2d');
-
-            // 배경
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, 600, 750);
-
-            // 테두리
-            ctx.strokeStyle = '#e5e7eb';
-            ctx.lineWidth = 2;
-            ctx.roundRect(30, 30, 540, 690, 12);
-            ctx.stroke();
-
-            // 제목
-            ctx.fillStyle = '#000000';
-            ctx.font = 'bold 32px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(title.substring(0, 15), 300, 100);
-
-            // 설명
-            ctx.fillStyle = '#666666';
-            ctx.font = '16px Arial';
-            ctx.fillText(`${cardsCount}개 카드로 구성`, 300, 150);
-
-            // 미리보기 박스
-            ctx.fillStyle = '#f0f0f0';
-            ctx.roundRect(60, 200, 480, 400, 8);
-            ctx.fill();
-
-            // 미리보기 텍스트
-            ctx.fillStyle = '#999999';
-            ctx.font = '18px Arial';
-            ctx.fillText('카드뉴스 미리보기', 300, 420);
-
-            preview = canvas.toDataURL('image/png');
-          } catch (e) {
-            // canvas 실패 시 기본 이미지 사용
-            preview = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-          }
-
+          // 프론트엔드에서 렌더링하도록 null 반환
+          // 대시보드에서 html2canvas를 사용할 예정
           return {
             id: `${timestamp}`,
             title: title,
             cardsCount: cardsCount,
             jobId: content.link?.split('jobId=')[1] || `card-${timestamp}`,
             timestamp: new Date(timestamp).toISOString(),
-            preview: preview,
+            preview: null, // 프론트엔드에서 처리
           };
         } catch (e) {
           console.warn('카드뉴스 파싱 실패:', e);

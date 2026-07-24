@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import {
   BarChart,
   Bar,
@@ -284,6 +284,7 @@ function CardNewsGallery() {
   const [cardNews, setCardNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState<string | null>(null);
+  const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     const fetchCardNews = async () => {
@@ -309,11 +310,24 @@ function CardNewsGallery() {
     return () => clearInterval(interval);
   }, []);
 
-  const downloadCardNews = async (item: any) => {
+  const downloadCardNews = async (item: any, element?: HTMLElement) => {
     setDownloading(item.id);
     try {
-      // 먼저 카드뉴스 미리보기 이미지 다운로드
-      if (item.preview) {
+      // html2canvas로 요소를 이미지로 변환
+      if (element) {
+        const html2canvas = (await import('html2canvas')).default;
+        const canvas = await html2canvas(element, {
+          backgroundColor: '#ffffff',
+          scale: 2,
+          useCORS: true,
+        });
+
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = `${item.title || 'card-news'}.png`;
+        link.click();
+      } else if (item.preview) {
         const response = await fetch(item.preview);
         if (!response.ok) throw new Error('이미지 다운로드 실패');
 
@@ -324,8 +338,6 @@ function CardNewsGallery() {
         a.download = `${item.title || 'card-news'}.png`;
         a.click();
         URL.revokeObjectURL(url);
-      } else {
-        alert('미리보기 이미지가 없습니다');
       }
     } catch (error) {
       console.error('❌ 다운로드 실패:', error);
@@ -379,7 +391,12 @@ function CardNewsGallery() {
               className="group bg-white rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300"
             >
               {/* 카드 미리보기 */}
-              <div className="relative bg-gray-100 aspect-[9/11.25] overflow-hidden">
+              <div
+                ref={(el) => {
+                  if (el) cardRefs.current[item.id] = el;
+                }}
+                className="relative bg-gradient-to-br from-blue-50 to-white aspect-[9/11.25] overflow-hidden p-6 flex flex-col justify-center items-center group-hover:from-blue-100"
+              >
                 {item.preview ? (
                   <img
                     src={item.preview}
@@ -387,8 +404,12 @@ function CardNewsGallery() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-gray-400 text-sm">미리보기 없음</p>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-gray-900 mb-2">{item.title}</p>
+                    <p className="text-sm text-gray-600">{item.cardsCount}개의 카드로 구성</p>
+                    <div className="mt-4 text-xs text-gray-400">
+                      카드뉴스 미리보기
+                    </div>
                   </div>
                 )}
               </div>
@@ -400,7 +421,7 @@ function CardNewsGallery() {
 
                 {/* 다운로드 버튼 */}
                 <button
-                  onClick={() => downloadCardNews(item)}
+                  onClick={() => downloadCardNews(item, cardRefs.current[item.id] || undefined)}
                   disabled={downloading === item.id}
                   className="w-full mt-4 py-2 px-3 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-sm rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
