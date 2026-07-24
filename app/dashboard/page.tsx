@@ -330,6 +330,26 @@ function CardNewsGallery() {
     }
   };
 
+  const deleteCardNews = async (timestamp: string) => {
+    if (!confirm('이 카드뉴스를 삭제하시겠습니까?')) return;
+
+    try {
+      const response = await fetch(
+        `/api/card-news/delete?userId=439664573&timestamp=${timestamp}`,
+        { method: 'DELETE' }
+      );
+
+      if (!response.ok) throw new Error('삭제 실패');
+
+      // 목록 새로고침
+      setCardNews((prev) => prev.filter((item) => item.id !== timestamp));
+      alert('삭제되었습니다');
+    } catch (error) {
+      console.error('❌ 삭제 실패:', error);
+      alert('삭제에 실패했습니다');
+    }
+  };
+
   return (
     <div className="bg-gray-50 rounded-2xl p-8 hover:bg-gray-100/50 transition-colors duration-300">
       {loading ? (
@@ -380,6 +400,14 @@ function CardNewsGallery() {
                   className="w-full mt-4 py-2 px-3 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-sm rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {downloading === item.jobId ? '다운로드 중...' : '📥 다운로드'}
+                </button>
+
+                {/* 삭제 버튼 */}
+                <button
+                  onClick={() => deleteCardNews(item.id)}
+                  className="w-full mt-2 py-2 px-3 bg-red-50 hover:bg-red-100 text-red-600 font-medium text-sm rounded-lg transition-colors duration-200"
+                >
+                  🗑️ 삭제
                 </button>
               </div>
             </div>
