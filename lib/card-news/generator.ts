@@ -18,96 +18,11 @@ interface CardNewsDeck {
   bg: string;
 }
 
-// AI 변환 응답 파싱
+// AI 변환 응답 파싱 (텍스트 기반)
 export function parseAIResponse(aiText: string): Partial<CardNewsDeck> {
-  try {
-    // AI 응답에서 JSON 추출
-    const jsonMatch = aiText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return fallbackParse(aiText);
-    }
-
-    const parsed = JSON.parse(jsonMatch[0]);
-
-    // 응답 검증 및 변환
-    const deck: Partial<CardNewsDeck> = {
-      cards: [],
-      preset: 'mag',
-      bg: parsed.bg || '한국 전통의 미',
-    };
-
-    // Cover 카드
-    if (parsed.title && parsed.subtitle) {
-      deck.cards!.push({
-        type: 'cover',
-        fields: {
-          badge: parsed.category || '한올 러그',
-          title: parsed.title,
-          sub: parsed.subtitle,
-        },
-      });
-    }
-
-    // Content 카드 (도입)
-    if (parsed.intro) {
-      deck.cards!.push({
-        type: 'content',
-        fields: {
-          idx: '0',
-          total: String(parsed.points?.length || 3),
-          tag: '도입',
-          num: '',
-          head: parsed.intro_title || '무엇인가?',
-          desc: parsed.intro || '',
-        },
-      });
-    }
-
-    // Content 카드 (포인트)
-    if (parsed.points && Array.isArray(parsed.points)) {
-      parsed.points.forEach((point: any, idx: number) => {
-        deck.cards!.push({
-          type: 'content',
-          fields: {
-            idx: String(idx + 1).padStart(2, '0'),
-            total: String(parsed.points.length),
-            tag: point.tag || 'Point',
-            num: String(idx + 1),
-            head: point.title || '',
-            desc: point.desc || '',
-          },
-        });
-      });
-    }
-
-    // Quote 카드
-    if (parsed.quote) {
-      deck.cards!.push({
-        type: 'quote',
-        fields: {
-          quote: parsed.quote,
-          by: parsed.quote_by || '한올 러그',
-        },
-      });
-    }
-
-    // Closing 카드
-    deck.cards!.push({
-      type: 'closing',
-      fields: {
-        head: '지금 바로 시작하세요',
-        desc: '한올 러그와 함께 공간을 변화시키세요',
-        cta1: '@hanol_marketing_bot 참여',
-        cta2: '질문하기',
-        hint: 'AI 마케팅 팀이 준비되어 있습니다',
-      },
-    });
-
-    return deck;
-  } catch (error) {
-    console.error('❌ AI 응답 파싱 실패:', error);
-    return fallbackParse(aiText);
-  }
+  // JSON 파싱 복잡도 제거
+  // 항상 텍스트 기반 fallbackParse 사용 (빠르고 안정적)
+  return fallbackParse(aiText);
 }
 
 // 폴백: 규칙 기반 파싱 (오프라인 모드)
