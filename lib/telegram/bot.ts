@@ -60,12 +60,10 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
     // 사용자 메시지 분석 (마케팅 단계 추적)
     analyzeUserIntent(userId, userMessage);
 
-    // 🎨 카드뉴스 수동 생성 (사용자가 "카드뉴스" 키워드를 포함할 때만)
-    if (shouldGenerateCardNews(userMessage)) {
-      generateCardNewsAsync(assistantMessage, userId).catch((err) => {
-        console.warn('⚠️ 카드뉴스 생성 실패 (백그라운드):', err);
-      });
-    }
+    // 🎨 카드뉴스 생성 (모든 AI 응답에 대해)
+    generateCardNewsAsync(assistantMessage, userId).catch((err) => {
+      console.warn('⚠️ 카드뉴스 생성 실패 (백그라운드):', err);
+    });
 
     return assistantMessage;
   } catch (error) {
