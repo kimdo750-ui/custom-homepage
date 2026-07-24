@@ -81,8 +81,8 @@ async function generateAIResponse(userMessage: string, conversationHistory: stri
 [관심 영역]: ${userContext.context.focusArea}`;
 
     const message = await client.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1500, // 더 상세한 답변을 위해 증가
+      model: 'claude-opus-4-8',
+      max_tokens: 1500,
       messages: [
         {
           role: 'user',
