@@ -17,13 +17,13 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
     // 메모리에 저장
     addMessage(userId, 'user', userMessage);
 
-    // DB에 사용자 메시지 저장 (비동기)
+    // DB에 사용자 메시지 저장 (비동기, 에러 무시)
     saveConversationLog({
       userId,
       role: 'user',
       content: userMessage,
       timestamp: new Date(),
-    }).catch((err) => console.error('⚠️ 사용자 메시지 DB 저장 실패:', err));
+    }).catch((err) => console.warn('⚠️ 사용자 메시지 DB 저장 실패 (무시됨):', err));
 
     // 대화 히스토리 가져오기
     const conversationHistory = getConversationHistory(userId, 8);
@@ -34,7 +34,7 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
     // 메모리에 저장
     addMessage(userId, 'assistant', assistantMessage);
 
-    // DB에 AI 응답 저장 (비동기)
+    // DB에 AI 응답 저장 (비동기, 에러 무시)
     const userContext = getOrCreateUserContext(userId);
     saveConversationLog({
       userId,
@@ -43,9 +43,9 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
       timestamp: new Date(),
       marketingStage: userContext.context.marketingStage,
       focusArea: userContext.context.focusArea,
-    }).catch((err) => console.error('⚠️ AI 응답 DB 저장 실패:', err));
+    }).catch((err) => console.warn('⚠️ AI 응답 DB 저장 실패 (무시됨):', err));
 
-    // 사용자 프로필 업데이트 (비동기)
+    // 사용자 프로필 업데이트 (비동기, 에러 무시)
     upsertUserProfile({
       userId,
       createdAt: new Date(),
@@ -54,7 +54,7 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
       currentStage: userContext.context.marketingStage,
       focusAreas: userContext.context.focusArea ? [userContext.context.focusArea] : [],
       tags: [],
-    }).catch((err) => console.error('⚠️ 사용자 프로필 업데이트 실패:', err));
+    }).catch((err) => console.warn('⚠️ 사용자 프로필 업데이트 실패 (무시됨):', err));
 
     // 사용자 메시지 분석 (마케팅 단계 추적)
     analyzeUserIntent(userId, userMessage);
