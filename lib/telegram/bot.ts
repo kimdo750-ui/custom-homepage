@@ -366,8 +366,8 @@ async function generateCardNewsAsync(aiResponse: string, userId: number): Promis
   }
 }
 
-// 사용자별 생성된 카드뉴스 저장소 (메모리 기반)
-const cardNewsStorage = new Map<
+// 사용자별 생성된 카드뉴스 저장소 (메모리 캐시 + DB 연동)
+const cardNewsCache = new Map<
   number,
   {
     timestamp: number;
@@ -383,26 +383,50 @@ export function saveGeneratedCardNews(
   cardsCount: number,
   link: string
 ): void {
-  if (!cardNewsStorage.has(userId)) {
-    cardNewsStorage.set(userId, []);
+  if (!cardNewsCache.has(userId)) {
+    cardNewsCache.set(userId, []);
   }
 
-  cardNewsStorage.get(userId)!.push({
+  const cardNews = {
     timestamp: Date.now(),
     title,
     cardsCount,
     link,
-  });
+  };
+
+  cardNewsCache.get(userId)!.push(cardNews);
 
   // 최대 10개만 유지
-  const history = cardNewsStorage.get(userId)!;
+  const history = cardNewsCache.get(userId)!;
   if (history.length > 10) {
     history.shift();
   }
 
   console.log(`💾 카드뉴스 저장: ${title} (${cardsCount}장)`);
+
+  // DB에도 저장 (비동기, 에러 무시)
+  saveConversationLog({
+    userId,
+    role: 'system',
+    content: JSON.stringify({
+      type: 'card-news-saved',
+      title,
+      cardsCount,
+      link,
+      timestamp: cardNews.timestamp,
+    }),
+    timestamp: new Date(),
+    focusArea: 'card-news',
+  }).catch((err) => console.warn('⚠️ 카드뉴스 DB 저장 실패:', err));
 }
 
 export function getGeneratedCardNews(userId: number): any[] {
-  return cardNewsStorage.get(userId) || [];
+  // 메모리 캐시에서 먼저 조회
+  const cached = cardNewsCache.get(userId);
+  if (cached && cached.length > 0) {
+    return cached;
+  }
+
+  // 캐시가 없으면 빈 배열 반환 (실제로는 DB에서 조회해야 함)
+  return [];
 }
