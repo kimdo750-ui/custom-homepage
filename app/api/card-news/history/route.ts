@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getConversationLogs } from '@/lib/db/connection';
+import { getUserConversationHistory } from '@/lib/db/connection';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const userIdNum = parseInt(userId, 10);
 
     // MongoDB에서 카드뉴스 기록 조회
-    const logs = await getConversationLogs(userIdNum);
+    const logs = await getUserConversationHistory(userIdNum, 100);
     const cardNewsLogs = logs
       .filter((log) => {
         try {
