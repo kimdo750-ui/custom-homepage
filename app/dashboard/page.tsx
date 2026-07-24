@@ -286,9 +286,27 @@ function CardNewsGallery() {
   const [downloading, setDownloading] = useState<string | null>(null);
 
   useEffect(() => {
-    // 실제로는 /api/card-news/history에서 사용자의 카드뉴스 히스토리를 로드
-    // 현재는 모의 데이터
-    setLoading(false);
+    const fetchCardNews = async () => {
+      try {
+        // 고정 사용자 ID (실제로는 인증에서 가져와야 함)
+        const userId = 439664573;
+        const response = await fetch(`/api/card-news/history?userId=${userId}`);
+        const data = await response.json();
+
+        if (data.success && data.cardNews) {
+          setCardNews(data.cardNews);
+        }
+      } catch (error) {
+        console.error('카드뉴스 로드 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCardNews();
+    // 30초마다 갱신
+    const interval = setInterval(fetchCardNews, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const downloadCardNews = async (jobId: string) => {
