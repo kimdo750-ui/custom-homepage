@@ -309,19 +309,24 @@ function CardNewsGallery() {
     return () => clearInterval(interval);
   }, []);
 
-  const downloadCardNews = async (jobId: string) => {
-    setDownloading(jobId);
+  const downloadCardNews = async (item: any) => {
+    setDownloading(item.id);
     try {
-      const response = await fetch(`/api/card-news/export?jobId=${jobId}&format=zip`);
-      if (!response.ok) throw new Error('다운로드 실패');
+      // 먼저 카드뉴스 미리보기 이미지 다운로드
+      if (item.preview) {
+        const response = await fetch(item.preview);
+        if (!response.ok) throw new Error('이미지 다운로드 실패');
 
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'card-news.zip';
-      a.click();
-      URL.revokeObjectURL(url);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${item.title || 'card-news'}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        alert('미리보기 이미지가 없습니다');
+      }
     } catch (error) {
       console.error('❌ 다운로드 실패:', error);
       alert('다운로드에 실패했습니다');
@@ -395,11 +400,11 @@ function CardNewsGallery() {
 
                 {/* 다운로드 버튼 */}
                 <button
-                  onClick={() => downloadCardNews(item.jobId)}
-                  disabled={downloading === item.jobId}
+                  onClick={() => downloadCardNews(item)}
+                  disabled={downloading === item.id}
                   className="w-full mt-4 py-2 px-3 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium text-sm rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {downloading === item.jobId ? '다운로드 중...' : '📥 다운로드'}
+                  {downloading === item.id ? '다운로드 중...' : '📥 다운로드'}
                 </button>
 
                 {/* 삭제 버튼 */}
