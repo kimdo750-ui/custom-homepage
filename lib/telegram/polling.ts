@@ -50,10 +50,21 @@ export async function startPolling() {
               response =
                 '현재 한올 러그 마케팅 준비 중입니다.\n질문을 입력해주면 구체적인 조언을 해드리겠습니다!';
             } else {
-              response = await handleUserMessage(userId, text);
+              try {
+                response = await handleUserMessage(userId, text);
+                if (!response) {
+                  response = '죄송해요, 응답을 생성할 수 없습니다. 잠시 후 다시 시도해주세요.';
+                }
+              } catch (msgError) {
+                console.error('❌ handleUserMessage 에러:', msgError);
+                response = '⚠️ 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
+              }
             }
 
-            await sendMessage(chatId, response);
+            const sendSuccess = await sendMessage(chatId, response);
+            if (!sendSuccess) {
+              console.error(`❌ 메시지 전송 실패: ${chatId}`);
+            }
           }
         }
 
