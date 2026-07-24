@@ -19,8 +19,8 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
     // 대화 히스토리 가져오기
     const conversationHistory = getConversationHistory(userId, 8);
 
-    // 템플릿 기반 응답 (API 호출 없음)
-    const assistantMessage = getDefaultResponse(userMessage);
+    // AI 응답 생성
+    const assistantMessage = await generateAIResponse(userMessage, conversationHistory);
 
     // AI 응답 저장
     addMessage(userId, 'assistant', assistantMessage);
@@ -32,6 +32,33 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
   } catch (error) {
     console.error('❌ 메시지 처리 실패:', error);
     return '죄송해요, 지금 응답을 처리할 수 없습니다. 잠시 후 다시 시도해주세요.';
+  }
+}
+
+async function generateAIResponse(userMessage: string, conversationHistory: string): Promise<string> {
+  try {
+    const prompt = generateMarketingPrompt(userMessage, conversationHistory);
+
+    const message = await client.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+    });
+
+    const response = message.content[0];
+    if (response.type === 'text') {
+      return response.text;
+    }
+    return '죄송해요, 응답을 생성할 수 없습니다.';
+  } catch (error) {
+    console.error('❌ AI 응답 생성 실패:', error);
+    // AI 실패 시 템플릿 기반 응답으로 폴백
+    return getDefaultResponse(userMessage);
   }
 }
 
