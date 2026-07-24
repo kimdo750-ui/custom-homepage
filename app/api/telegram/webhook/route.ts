@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(
     {
       status: 'ok',
-      message: '한올 러그 마케팍 봇이 운영 중입니다.',
+      message: '한올 러그 마케팅 봇이 운영 중입니다.',
     },
     { status: 200 }
   );

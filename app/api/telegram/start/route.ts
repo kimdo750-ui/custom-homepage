@@ -23,11 +23,11 @@ export async function GET() {
     return NextResponse.json(
       {
         status: 'success',
-        message: '🤖 한올 마케팍 봇이 시작되었습니다!',
+        message: '🤖 한올 마케팅 봇이 시작되었습니다!',
         instructions: [
           '1. 텔레그램에서 @hanol_marketing_bot 검색',
           '2. /start 입력해서 시작하기',
-          '3. 마케팍 질문을 자유롭게 입력하기',
+          '3. 마케팅 질문을 자유롭게 입력하기',
         ],
       },
       { status: 200 }

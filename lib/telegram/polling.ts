@@ -12,7 +12,7 @@ export async function startPolling() {
     return;
   }
 
-  console.log('🤖 한올 마케팍 봇 Polling 시작...');
+  console.log('🤖 한올 마케팅 봇 Polling 시작...');
 
   // 매 2초마다 메시지 확인
   setInterval(async () => {
@@ -43,12 +43,12 @@ export async function startPolling() {
               response = `도움말:
 /start - 인사말과 안내
 /help - 이 도움말
-/status - 마케팍 진행 상황
+/status - 마케팅 진행 상황
 
-그 외에는 자유로운 마케팍 질문을 해주세요!`;
+그 외에는 자유로운 마케팅 질문을 해주세요!`;
             } else if (text === '/status') {
               response =
-                '현재 한올 러그 마케팍 준비 중입니다.\n질문을 입력해주면 구체적인 조언을 해드리겠습니다!';
+                '현재 한올 러그 마케팅 준비 중입니다.\n질문을 입력해주면 구체적인 조언을 해드리겠습니다!';
             } else {
               response = await handleUserMessage(userId, text);
             }
