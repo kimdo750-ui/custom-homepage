@@ -47,25 +47,28 @@ function fallbackParse(text: string): Partial<CardNewsDeck> {
     });
   }
 
-  // 본문 → content 카드
+  // 본문 → content 카드 (최대 5개로 제한)
   const contentLines = lines.slice(2);
-  contentLines.forEach((line, idx) => {
+  let contentCardCount = 0;
+  const MAX_CARDS = 5;
+
+  for (let idx = 0; idx < contentLines.length && contentCardCount < MAX_CARDS; idx++) {
+    const line = contentLines[idx];
     if (line.trim()) {
       deck.cards!.push({
         type: 'content',
         fields: {
-          idx: String(idx + 1).padStart(2, '0'),
-          total: String(Math.min(contentLines.length, 5)),
+          idx: String(contentCardCount + 1).padStart(2, '0'),
+          total: String(Math.min(contentLines.filter((l) => l.trim()).length, MAX_CARDS)),
           tag: 'Point',
-          num: String(idx + 1),
+          num: String(contentCardCount + 1),
           head: line.substring(0, 30),
           desc: line.substring(30, 80),
         },
       });
-
-      if (idx >= 4) return; // 최대 5개 포인트
+      contentCardCount++;
     }
-  });
+  }
 
   // Closing 카드
   deck.cards!.push({
