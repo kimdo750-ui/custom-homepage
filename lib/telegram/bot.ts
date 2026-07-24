@@ -60,10 +60,12 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
     // 사용자 메시지 분석 (마케팅 단계 추적)
     analyzeUserIntent(userId, userMessage);
 
-    // 🎨 카드뉴스 자동 생성 (백그라운드)
-    generateCardNewsAsync(assistantMessage, userId).catch((err) => {
-      console.warn('⚠️ 카드뉴스 생성 실패 (백그라운드):', err);
-    });
+    // 🎨 카드뉴스 수동 생성 (사용자가 "카드뉴스" 키워드를 포함할 때만)
+    if (shouldGenerateCardNews(userMessage)) {
+      generateCardNewsAsync(assistantMessage, userId).catch((err) => {
+        console.warn('⚠️ 카드뉴스 생성 실패 (백그라운드):', err);
+      });
+    }
 
     return assistantMessage;
   } catch (error) {
@@ -246,6 +248,24 @@ function getDefaultResponse(userMessage: string): string {
 - "작가 협력"
 
 이렇게 물어봐주세요! 💪`;
+}
+
+// 🎨 카드뉴스 생성 필요 여부 판단
+function shouldGenerateCardNews(message: string): boolean {
+  const lowerMessage = message.toLowerCase();
+  const cardNewsKeywords = [
+    '카드뉴스',
+    '카드',
+    '뉴스',
+    '콘텐츠',
+    '만들어',
+    '생성해',
+    '생성하',
+    '만들',
+    '이미지',
+  ];
+
+  return cardNewsKeywords.some((keyword) => lowerMessage.includes(keyword));
 }
 
 function analyzeUserIntent(userId: number, message: string) {
