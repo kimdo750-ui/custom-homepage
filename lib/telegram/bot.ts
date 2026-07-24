@@ -37,11 +37,15 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
 
 async function generateAIResponse(userMessage: string, conversationHistory: string): Promise<string> {
   try {
-    const prompt = generateMarketingPrompt(userMessage, conversationHistory);
+    const userContext = getOrCreateUserContext(0); // 기본 컨텍스트 (텔레그램에서는 userId 사용)
+    const prompt = `${generateMarketingPrompt(userMessage, conversationHistory)}
+
+[현재 사용자 단계]: ${userContext.context.marketingStage}
+[관심 영역]: ${userContext.context.focusArea}`;
 
     const message = await client.messages.create({
       model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
+      max_tokens: 1500, // 더 상세한 답변을 위해 증가
       messages: [
         {
           role: 'user',
