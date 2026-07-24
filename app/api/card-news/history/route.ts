@@ -20,9 +20,11 @@ export async function GET(request: NextRequest) {
     const cardNewsLogs = logs
       .filter((log) => {
         try {
-          if (log.focusArea === 'card-news') {
+          // focusArea가 'card-news' 또는 'card-news-generation'인 경우
+          if (log.focusArea === 'card-news' || log.focusArea === 'card-news-generation') {
             const content = JSON.parse(log.content || '{}');
-            return content.type === 'card-news-saved';
+            // type이 'card-news-saved'이거나 단순 텍스트인 경우
+            return content.type === 'card-news-saved' || typeof content === 'string' || content.includes?.('카드뉴스');
           }
           return false;
         } catch {
