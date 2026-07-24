@@ -15,6 +15,8 @@ const client = new Anthropic({
 
 export async function handleUserMessage(userId: number, userMessage: string): Promise<string> {
   try {
+    console.log(`📱 사용자 메시지 처리 시작: ${userMessage}`);
+
     // 메모리에 저장
     addMessage(userId, 'user', userMessage);
 
@@ -30,7 +32,9 @@ export async function handleUserMessage(userId: number, userMessage: string): Pr
     const conversationHistory = getConversationHistory(userId, 8);
 
     // AI 응답 생성
+    console.log(`🤖 AI 응답 생성 중...`);
     const assistantMessage = await generateAIResponse(userMessage, conversationHistory);
+    console.log(`✅ AI 응답 생성 완료: ${assistantMessage.substring(0, 50)}...`);
 
     // 메모리에 저장
     addMessage(userId, 'assistant', assistantMessage);
