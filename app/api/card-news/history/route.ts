@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserConversationHistory } from '@/lib/db/connection';
+import { createCanvas } from 'canvas';
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,8 +40,49 @@ export async function GET(request: NextRequest) {
           const title = content.title || log.content?.substring(0, 20) || '마케팅 카드뉴스';
           const cardsCount = content.cardsCount || 5;
 
-          // 미리보기 이미지 생성 (SVG 기반)
-          const previewSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='750' viewBox='0 0 600 750'%3E%3Crect width='600' height='750' fill='%23f8f9fa'/%3E%3Crect x='30' y='30' width='540' height='690' fill='white' stroke='%23ddd' stroke-width='2' rx='12'/%3E%3Ctext x='300' y='100' font-family='Arial, sans-serif' font-size='32' font-weight='bold' text-anchor='middle' fill='%23000'%3E${encodeURIComponent(title.substring(0, 15))}'%3E%3C/text%3E%3Ctext x='300' y='150' font-family='Arial, sans-serif' font-size='16' text-anchor='middle' fill='%23666'%3E${cardsCount}개 카드로 구성%3C/text%3E%3Crect x='60' y='200' width='480' height='400' fill='%23f0f0f0' rx='8'/%3E%3Ctext x='300' y='420' font-family='Arial, sans-serif' font-size='18' text-anchor='middle' fill='%23999'%3E카드뉴스 미리보기%3C/text%3E%3C/svg%3E`;
+          // 간단한 PNG 이미지 생성 (1x1 흰 픽셀로 시작)
+          // canvas 사용 불가능 시 fallback
+          let preview = '';
+          try {
+            const canvas = createCanvas(600, 750);
+            const ctx = canvas.getContext('2d');
+
+            // 배경
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 600, 750);
+
+            // 테두리
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 2;
+            ctx.roundRect(30, 30, 540, 690, 12);
+            ctx.stroke();
+
+            // 제목
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title.substring(0, 15), 300, 100);
+
+            // 설명
+            ctx.fillStyle = '#666666';
+            ctx.font = '16px Arial';
+            ctx.fillText(`${cardsCount}개 카드로 구성`, 300, 150);
+
+            // 미리보기 박스
+            ctx.fillStyle = '#f0f0f0';
+            ctx.roundRect(60, 200, 480, 400, 8);
+            ctx.fill();
+
+            // 미리보기 텍스트
+            ctx.fillStyle = '#999999';
+            ctx.font = '18px Arial';
+            ctx.fillText('카드뉴스 미리보기', 300, 420);
+
+            preview = canvas.toDataURL('image/png');
+          } catch (e) {
+            // canvas 실패 시 기본 이미지 사용
+            preview = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+          }
 
           return {
             id: `${timestamp}`,
@@ -48,7 +90,7 @@ export async function GET(request: NextRequest) {
             cardsCount: cardsCount,
             jobId: content.link?.split('jobId=')[1] || `card-${timestamp}`,
             timestamp: new Date(timestamp).toISOString(),
-            preview: previewSvg,
+            preview: preview,
           };
         } catch (e) {
           console.warn('카드뉴스 파싱 실패:', e);
